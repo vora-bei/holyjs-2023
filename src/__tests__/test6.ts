@@ -1,0 +1,85 @@
+import rawFilms from '../data/films1.json'
+import {stemmer} from 'stemmer-ru';
+
+const stemmerRu = new stemmer();
+
+const films = rawFilms as string[];
+const tokenizr = (film: string) => {
+    return film
+        .toLocaleLowerCase()
+        .split(/[\s\.,!?]/)
+        .map((word) => stemmerRu.stemWord(word))
+        .filter(Boolean) as string[];
+}
+export const createIndex: (films: string[]) => Map<string, Set<number>> = (films: string[]) => films
+    .reduce((sum, film, row) => {
+        tokenizr(film)
+            .forEach(term => {
+                if (!sum.has(term)) {
+                    sum.set(term, new Set());
+                }
+                sum.get(term)!.add(row);
+            })
+        return sum;
+    }, new Map<string, Set<number>>());
+const index = createIndex(films);
+const getWeights = (terms: string[]): { index: number, weight: number }[] => {
+    const preSearch: Set<number>[] = terms
+        .map(term => index.get(term))
+        .filter(Boolean) as Set<number>[];
+    const weights = preSearch.reduce((sum, v, k) => {
+        v.forEach(num => {
+            const count = sum.get(num) || 0;
+            sum.set(num, count + 1)
+        })
+        return sum;
+    }, new Map<number, number>());
+    const entries = [...weights.entries()]
+    entries.sort((a, b) => b[1] - a[1]);
+    return entries
+        .map((row) => {
+            return {index: row[0], weight: row[1]};
+        })
+}
+
+const search6 = (index: Map<string, Set<number>>, films: string[], search: string) => {
+    const terms = tokenizr(search);
+    const weights = getWeights(terms);
+    return weights
+        .map((row) => {
+            return films[row.index];
+        });
+}
+
+describe('Stemmer', () => {
+    test("Открытое настеж окно.", () => {
+        expect(search6(index, films, "окно"))
+            .toStrictEqual(["Открытое настеж окно."]);
+    });
+    test("Особо важное задание", () => {
+        expect(search6(index, films, "особо")).toHaveLength(4);
+    });
+    test("открытое окно", () => {
+        expect(search6(index, films, "открытое окно")).toHaveLength(1);
+    });
+    test("открытый", () => {
+        expect(search6(index, films, "открытый"))
+            .toStrictEqual(["Открытое настеж окно.", "Открытый простор"]);
+    });
+    test("звенящее деревца", () => {
+        expect(search6(index, films, "звенящее деревце")).toHaveLength(1);
+    });
+    test("открытые", () => {
+        expect(search6(index, films, "открытые"))
+            .toStrictEqual(["Открытое настеж окно.", "Открытый простор"]);
+    });
+});
+
+
+const printIndex = [...index.entries()].reduce((sum, v) => {
+    sum[v[0]] = [...v[1]]
+    return sum;
+}, {} as { [key: string]: number[] })
+console.log(printIndex);
+console.log(films.map(i => tokenizr(i)));
+
