@@ -4,7 +4,8 @@ const stemmerRu = new stemmer();
 const tokenizr = (film: string) => film
     .toLocaleLowerCase()
     .split(/[\s\.,!?]/)
-    .map((word) => stemmerRu.stemWord(word) || word);
+    .map((word) => stemmerRu.stemWord(word) || word)
+    .filter(Boolean) as string[];
 
 export const search = (films: string[], search: string) => {
     const terms = tokenizr(search)

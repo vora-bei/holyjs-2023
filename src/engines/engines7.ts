@@ -54,9 +54,7 @@ const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index:
 
 export const search = (index: Map<string, Set<number>>, films: string[], search: string) => {
     const terms = tokenizr(search);
-    console.log(terms);
     const weights = getWeights(terms, index);
-    console.log(weights);
     return weights
         .map((row) => {
             return films[row.index];

@@ -6,7 +6,7 @@ const tokenizr = (film: string) => {
     return film
         .toLocaleLowerCase()
         .split(/[\s\.,!?]/)
-        .map((word) => stemmerRu.stemWord(word))
+        .map((word) => stemmerRu.stemWord(word) || word)
         .filter(Boolean) as string[];
 }
 export const createIndex: (films: string[]) => Map<string, Set<number>> = (films: string[]) => films
@@ -40,10 +40,11 @@ const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index:
 }
 
 export const search = (index: Map<string, Set<number>>, films: string[], search: string) => {
+    if(!search || !search.length){
+        return films;
+    }
     const terms = tokenizr(search);
-    console.log(terms);
     const weights = getWeights(terms, index);
-    console.log(weights);
     return weights
         .map((row) => {
             return films[row.index];
