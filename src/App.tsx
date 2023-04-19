@@ -9,6 +9,7 @@ import {search as search3} from './engines/engines3';
 import {search as search4} from './engines/engines4';
 import {search as search6, createIndex as createIndex6} from './engines/engines6';
 import {search as search7, createIndex as createIndex7} from './engines/engines7';
+import {search as search8} from './engines/engines8';
 import './App.css'
 
 const exampleFilms = [
@@ -41,6 +42,7 @@ function App() {
                 setFilm7Index(createIndex7(films))
             })
     }, [])
+    const t0 = performance.now();
     const result = useMemo(() => {
         const data = dataSize === 'little' ? exampleFilms : films;
         const index7L = dataSize === 'little' ? index7 : film7Index;
@@ -58,11 +60,13 @@ function App() {
                 return search6(index6L, data, search)
             case "n-gram indexed":
                 return search7(index7L, data, search)
+            case "levenshtein":
+                return search8(data, search)
             default:
                 return search1(data, search);
         }
-
     }, [search, films, dataSize, engine]);
+    const t1 = performance.now();
 
     const bigRender = () => result
         .slice(0, 100)
@@ -99,6 +103,7 @@ function App() {
                                         <option value="lemming">Леметизация</option>
                                         <option value="lemming indexed">Леметизация индекс</option>
                                         <option value="n-gram indexed">n-gram индекс</option>
+                                        <option value="levenshtein">Левенштейн</option>
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group as={Col} controlId="formGridEmail">
@@ -143,7 +148,7 @@ function App() {
                             <p>
                                 В этом режиме мы меряем скорость
                             </p>
-
+                            {Math.ceil(t1 - t0)} ms
                         </> : null}
 
                     </Col>
