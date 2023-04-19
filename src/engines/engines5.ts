@@ -7,10 +7,12 @@ const tokenizr = (film: string) => film
     .map((word) => stemmerRu.stemWord(word) || word)
     .filter(Boolean) as string[];
 
-export const search = (films: string[], search: string) => {
+export const createIndex: (films: string[]) => Set<string>[] = (films: string[]) =>
+    films.map(film=> new Set<string>(tokenizr(film)));
+
+export const search = (index: Set<string>[], films: string[], search: string) => {
     const terms = tokenizr(search)
-    return films.filter(film => {
-        const words = new Set(tokenizr(film));
-        return terms.every(term => words.has(term))
+    return films.filter((film, i) => {
+        return terms.every(term => index[i].has(term))
     });
 }
