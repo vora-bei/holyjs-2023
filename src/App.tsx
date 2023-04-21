@@ -176,22 +176,23 @@ function App() {
                     <Col>
                         <h2 className={"center"}>Легенда</h2>
                         <Alert variant={"success"}>
-                            <h3> Нашло одинаково <Badge bg={"success"}>{successCount}</Badge></h3>
+                            <h3> Нашло одинаково <Badge className={"float-end"} bg={"success"}>{successCount}</Badge></h3>
                         </Alert>
                         <Alert variant={"danger"}>
                             <h3>
-                                Не нашло <Badge bg={missedCount > 20 ? "danger" : "success"}>{missedCount}</Badge>
+                                Не нашло <Badge className={"float-end"} bg={missedCount > 0 ? "danger" : "success"}>{missedCount}</Badge>
                             </h3>
                         </Alert>
                         <Alert variant={"info"}>
                             <h3>
                                 Экстра результаты <Badge
+                                className={"float-end"}
                                 bg={extraCount > 5000 ? "danger" : "success"}>{extraCount}</Badge>
                             </h3>
                         </Alert>
-                        <h2>
-                            Время поиска <Badge bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms</Badge>
-                        </h2>
+                        <h3>
+                            Время поиска <Badge className={"float-end"} bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms</Badge>
+                        </h3>
                     </Col>
                 </Row>
             </Container>
