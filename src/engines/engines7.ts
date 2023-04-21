@@ -3,7 +3,7 @@ import {stemmer} from 'stemmer-ru';
 const stemmerRu = new stemmer();
 
 const gramm3 = (word: string) => {
-    const words = [...word].map((w: string, i: number, array: string[]) => {
+    const words = [...(" "  + word)].map((w: string, i: number, array: string[]) => {
         if (i - 2 >= 0) {
             return array[i - 2] + array[i - 1] + w
         } else {
@@ -53,9 +53,13 @@ const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index:
 }
 
 export const search = (index: Map<string, Set<number>>, films: string[], search: string) => {
+    if(search===''){
+        return films;
+    }
     const terms = tokenizr(search);
     const weights = getWeights(terms, index);
     return weights
+        .filter(({index, weight})=> weight > Math.max(0, terms.length - 2))
         .map((row) => {
             return films[row.index];
         });

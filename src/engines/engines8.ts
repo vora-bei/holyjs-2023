@@ -11,5 +11,5 @@ export const search = (films: string[], search: string) => {
         return films;
     }
     return films
-        .filter((v, index) => dist(v, search) <= Math.max(search.length - 3, 0));
+        .filter((v, index) => dist(v, search) <= Math.max(search.length - 5, 0));
 };

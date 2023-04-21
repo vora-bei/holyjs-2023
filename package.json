@@ -11,6 +11,7 @@
   "dependencies": {
     "bootstrap": "^5.2.3",
     "fastest-levenshtein": "^1.0.16",
+    "n-gram": "^2.0.2",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
