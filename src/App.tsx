@@ -1,8 +1,10 @@
 import {useDeferredValue, useEffect, useMemo, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {HandIndexFill, HandThumbsDownFill, HandThumbsUpFill} from 'react-bootstrap-icons';
+
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import {Alert, Badge, Col, Container, Row} from 'react-bootstrap';
+import {Badge, Col, Container, Row, Table} from 'react-bootstrap';
 import {search as search1} from './engines/engines1';
 import {search as search2} from './engines/engines2';
 import {search as search3} from './engines/engines3';
@@ -14,10 +16,10 @@ import {search as search8} from './engines/engines8';
 import './App.css'
 
 const exampleFilms = [
-    "Почти знаменит",
-    "Открытое настеж окно.",
-    "Открытый простор",
-    "Особо важное задание",
+    "Аватар",
+    "Джон уик",
+    "Матрица: Перезагрузка",
+    "Смурфики. Волшебная игла портного",
     "Особо опасен 1",
     "Особо опасен 2",
     "Особо опасен 3",
@@ -74,127 +76,119 @@ function App() {
         }
     }, [search, films, dataSize, engine]);
     const resultCompared = useMemo(() => {
-        return search7(dataSize ==='little' ? index7: film7Index, dataSize ==='little'? exampleFilms : films, search)
+        return search7(dataSize === 'little' ? index7 : film7Index, dataSize === 'little' ? exampleFilms : films, search)
     }, [search, films, dataSize, engine]);
+    const color = (film: string, resultSet: Set<string>, comparedSet: Set<string>) => {
+        if (resultSet.has(film) && comparedSet.has(film)) {
+            return <HandThumbsUpFill color={"green"}/>
+        }
+        if (resultSet.has(film)) {
+            return <HandIndexFill color={"orange"}/>;
+        }
+        if (comparedSet.has(film)) {
+            return <HandThumbsDownFill color={"red"}/>;
+        }
+        return null;
+    }
     const t1 = performance.now();
     const resultSet = new Set(result);
     const comparedSet = new Set(resultCompared);
     const missedCount = resultCompared.filter(film => !resultSet.has(film)).length;
     const successCount = resultCompared.filter(film => resultSet.has(film)).length;
     const extraCount = result.filter(film => !comparedSet.has(film)).length;
-    const bigRender = () => {
+
+    const bigRender = (films: string[]) => {
         const resultSet = new Set(result);
         const comparedSet = new Set(resultCompared);
-        const variant = (film: string) =>{
-            if(resultSet.has(film) && comparedSet.has(film)){
-                return 'success';
+        const success = films
+            .filter(film => resultSet.has(film) && comparedSet.has(film))
+        const errors = films
+            .filter(film => !resultSet.has(film) && comparedSet.has(film))
+        const extras = films
+            .filter(film => resultSet.has(film) && !comparedSet.has(film))
+        const others = films
+            .filter(film => !resultSet.has(film) && !comparedSet.has(film))
+        const resortResults = [...success, ...errors, ...extras, ...others];
+        return <Table striped bordered hover>
+            <thead>
+            <tr>
+                <th>Фильм</th>
+                <th>{engine} алгоритм <Badge>{result.length}</Badge></th>
+                <th>Секретный алгоритм <Badge>{resultCompared.length}</Badge></th>
+                <th>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge></th>
+            </tr>
+            </thead>
+            <tbody>
+            {
+                resortResults
+                    .slice(0, 1000)
+                    .map((film, i) =>
+                        <tr key={i}>
+                            <td width={'40%'}>{film}</td>
+                            <td align={"center"}>{resultSet.has(film) ? <HandThumbsUpFill color={"green"}/> : null}</td>
+                            <td align={"center"}>{comparedSet.has(film) ?
+                                <HandThumbsUpFill color={"green"}/> : null}</td>
+                            <td align={"center"}>
+                                {color(film, resultSet, comparedSet)}
+                            </td>
+                        </tr>
+                    )
             }
-            if(resultSet.has(film)){
-                return 'info';
-            }
-            if(comparedSet.has(film)){
-                return 'danger';
-            }
-            return 'secondary'
-        }
-        return films
-            .filter(film => resultSet.has(film) || comparedSet.has(film))
-            .slice(0, 1000)
-            .map((film, i) =>
-                <Alert key={i} variant={variant(film)}>
-                    {film}
-                </Alert>);
-    }
-    const exampleRender = () => {
-        const resultSet = new Set(result);
-        const comparedSet = new Set(search7(index7, exampleFilms, search));
-        const variant = (film: string) =>{
-            if(resultSet.has(film) && comparedSet.has(film)){
-                return 'success';
-            }
-            if(resultSet.has(film)){
-                return 'info';
-            }
-            if(comparedSet.has(film)){
-                return 'danger';
-            }
-            return 'secondary'
-        }
-
-        return exampleFilms
-            .map((film, i) =>
-                <Alert key={i} variant={variant(film)}>
-                    {film}
-                </Alert>);
+            </tbody>
+        </Table>
     }
     const timeSearch = Math.ceil(t1 - t0)
     return (
         <div className="App">
             <Container>
-                <Row>
-                    <Col>
-                        <Form>
-                            <Row>
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                    <Form.Label>Стратегия поиска</Form.Label>
-                                    <Form.Select defaultValue={engine}
-                                                 onChange={(e) => setEngine(e.currentTarget.value)}
-                                                 aria-label="Стратегия поиска">
-                                        <option value="simple">Наивый вариант</option>
-                                        <option value="lowercase">Lowercase</option>
-                                        <option value="stemming">Стеминг</option>
-                                        <option value="lemming">Леметизация</option>
-                                        <option value="lemming pre-calculate">Леметизация предрасчет</option>
-                                        <option value="lemming indexed">Леметизация индекс</option>
-                                        <option value="levenshtein">Левенштейн</option>
-                                        <option value="n-gram indexed">n-gram индекс</option>
-                                        <option value="n-gram spread index">n-gram индекс</option>
-                                    </Form.Select>
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                    <Form.Label>Показать</Form.Label>
-                                    <Form.Select defaultValue={dataSize}
-                                                 onChange={(e) => setDataSize(e.currentTarget.value)}
-                                                 aria-label="Данные">
-                                        <option value="little">Срез данных</option>
-                                        <option value="large">Все данные</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Row>
-                        </Form>
-                        <InputGroup className="mb-3 mt-3">
-                            <Form.Control
-                                type={'search'}
-                                placeholder="Поиск"
-                                aria-label="Поиск"
-                                defaultValue={search}
-                                onInput={(e) => setSearch(e.currentTarget.value)}
-                            />
-                        </InputGroup>
-                        <div>{dataSize === 'little' ? exampleRender() : bigRender()}</div>
-                    </Col>
-                    <Col>
-                        <h2 className={"center"}>Легенда</h2>
-                        <Alert variant={"success"}>
-                            <h3> Нашло одинаково <Badge className={"float-end"} bg={"success"}>{successCount}</Badge></h3>
-                        </Alert>
-                        <Alert variant={"danger"}>
-                            <h3>
-                                Не нашло <Badge className={"float-end"} bg={missedCount > 0 ? "danger" : "success"}>{missedCount}</Badge>
-                            </h3>
-                        </Alert>
-                        <Alert variant={"info"}>
-                            <h3>
-                                Экстра результаты <Badge
-                                className={"float-end"}
-                                bg={extraCount > 5000 ? "danger" : "success"}>{extraCount}</Badge>
-                            </h3>
-                        </Alert>
-                        <h3>
-                            Время поиска <Badge className={"float-end"} bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms</Badge>
-                        </h3>
-                    </Col>
-                </Row>
+                <h1>Тестовый полигон</h1>
+                <Form>
+                    <Row>
+                        <Form.Group as={Col} controlId="formGridEmail">
+                            <Form.Label>Стратегия поиска</Form.Label>
+                            <Form.Select defaultValue={engine}
+                                         onChange={(e) => setEngine(e.currentTarget.value)}
+                                         aria-label="Стратегия поиска">
+                                <option value="simple">Наивый вариант</option>
+                                <option value="lowercase">Lowercase</option>
+                                <option value="stemming">Стеминг</option>
+                                <option value="lemming">Леметизация</option>
+                                <option value="lemming pre-calculate">Леметизация предрасчет</option>
+                                <option value="lemming indexed">Леметизация индекс</option>
+                                <option value="levenshtein">Левенштейн</option>
+                                <option value="n-gram indexed">n-gram индекс</option>
+                                <option value="n-gram spread index">n-gram индекс</option>
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>Показать</Form.Label>
+                            <Form.Select defaultValue={dataSize}
+                                         onChange={(e) => setDataSize(e.currentTarget.value)}
+                                         aria-label="Данные">
+                                <option value="little">Срез данных</option>
+                                <option value="large">Все данные</option>
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Время поиска <Badge
+                                    bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms</Badge>
+                                </h3>
+                            </Form.Label>
+                        </Form.Group>
+                    </Row>
+                    <InputGroup className="mb-3 mt-3">
+                        <Form.Control
+                            type={'search'}
+                            placeholder="Поиск"
+                            aria-label="Поиск"
+                            defaultValue={search}
+                            onInput={(e) => setSearch(e.currentTarget.value)}
+                        />
+                    </InputGroup>
+                </Form>
+                <div>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
             </Container>
         </div>
     )
