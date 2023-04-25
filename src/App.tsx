@@ -13,6 +13,7 @@ import {createIndex as createIndex5, search as search5} from './engines/engines5
 import {createIndex as createIndex6, search as search6} from './engines/engines6';
 import {createIndex as createIndex7, search as search7} from './engines/engines7';
 import {search as search8} from './engines/engines8';
+import {search as search9, timeStart as timeStart9, contentLength as contentLength9} from './engines/engines9';
 import './App.css'
 
 const exampleFilms = [
@@ -31,6 +32,11 @@ const index5 = createIndex5(exampleFilms);
 
 function App() {
     const [films, setFilms] = useState<string[]>([]);
+    const [contentLength, setContentLength] = useState<number>(0);
+    const [timeStart5, setTimeStart5] = useState<number>(0);
+    const [timeStart6, setTimeStart6] = useState<number>(0);
+    const [timeStart7, setTimeStart7] = useState<number>(0);
+    const [search9Result, setSearch9Result] = useState<string[]>([]);
     const [film5Index, setFilm5Index] = useState<Set<string>[]>([]);
     const [film6Index, setFilm6Index] = useState<Map<string, Set<number>>>(new Map());
     const [film7Index, setFilm7Index] = useState<Map<string, Set<number>>>(new Map());
@@ -40,12 +46,25 @@ function App() {
     const search = useDeferredValue(localSearch)
     useEffect(() => {
         fetch("films.json")
-            .then(res => res.json())
+            .then(res => {
+                setContentLength(parseInt(res.headers.get("Content-Length") || "0"));
+                return res.json()
+            })
             .then(films => {
                 setFilms(films)
+                const t0 = performance.now();
                 setFilm5Index(createIndex5(films))
+                const t1 = performance.now();
+                setTimeStart5(Math.ceil(t1 - t0))
+                const t01 = performance.now();
                 setFilm6Index(createIndex6(films))
+                const t11 = performance.now();
+                setTimeStart6(Math.ceil(t11 - t01))
+                const t02 = performance.now();
                 setFilm7Index(createIndex7(films))
+                const t12 = performance.now();
+                setTimeStart7(Math.ceil(t12 - t02))
+
             })
     }, [])
     const t0 = performance.now();
@@ -71,10 +90,17 @@ function App() {
                 return search7(index7L, data, search)
             case "levenshtein":
                 return search8(data, search)
+            case "n-gram spread index":
+                return search9Result
             default:
                 return search1(data, search);
         }
-    }, [search, films, dataSize, engine]);
+    }, [search, films, search9Result, dataSize, engine]);
+    useEffect(() => {
+        (async () => {
+            setSearch9Result(await search9(search));
+        })()
+    }, [search, films])
     const resultCompared = useMemo(() => {
         return search7(dataSize === 'little' ? index7 : film7Index, dataSize === 'little' ? exampleFilms : films, search)
     }, [search, films, dataSize, engine]);
@@ -92,11 +118,25 @@ function App() {
     }
     const t1 = performance.now();
     const resultSet = new Set(result);
-    const comparedSet = new Set(resultCompared);
     const missedCount = resultCompared.filter(film => !resultSet.has(film)).length;
     const successCount = resultCompared.filter(film => resultSet.has(film)).length;
-    const extraCount = result.filter(film => !comparedSet.has(film)).length;
-
+    const timeStart = () => {
+        if (dataSize === 'little') {
+            return 1;
+        }
+        switch (engine) {
+            case "lemming pre-calculate":
+                return timeStart5;
+            case "lemming indexed":
+                return timeStart6;
+            case "n-gram indexed":
+                return timeStart7;
+            case "n-gram spread index":
+                return timeStart9;
+            default:
+                return 1;
+        }
+    }
     const bigRender = (films: string[]) => {
         const resultSet = new Set(result);
         const comparedSet = new Set(resultCompared);
@@ -157,7 +197,7 @@ function App() {
                                 <option value="lemming indexed">Леметизация индекс</option>
                                 <option value="levenshtein">Левенштейн</option>
                                 <option value="n-gram indexed">n-gram индекс</option>
-                                <option value="n-gram spread index">n-gram индекс</option>
+                                <option value="n-gram spread index">n-gram cdn индекс</option>
                             </Form.Select>
                         </Form.Group>
                         <Form.Group as={Col}>
@@ -169,14 +209,6 @@ function App() {
                                 <option value="large">Все данные</option>
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group as={Col}>
-                            <Form.Label>
-                                <h3 style={{marginTop: "32px"}}>
-                                    Время поиска <Badge
-                                    bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms</Badge>
-                                </h3>
-                            </Form.Label>
-                        </Form.Group>
                     </Row>
                     <InputGroup className="mb-3 mt-3">
                         <Form.Control
@@ -187,6 +219,41 @@ function App() {
                             onInput={(e) => setSearch(e.currentTarget.value)}
                         />
                     </InputGroup>
+                    <Row>
+                        <Form.Group as={Col}>
+                            <Form.Label>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Время поиска <Badge
+                                    bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
+                                </Badge>
+                                </h3>
+                            </Form.Label>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Время старта
+                                    {dataSize === 'little' ?
+                                        <Badge>1 ms</Badge> :
+                                        <Badge bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
+                                    }
+                                </h3>
+                            </Form.Label>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Скачалось
+                                    {dataSize === 'little' ?
+                                        <Badge>0.1 KB</Badge> :
+                                        <Badge>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
+                                    }
+                                    <Badge>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge>
+
+                                </h3>
+                            </Form.Label>
+                        </Form.Group>
+                    </Row>
                 </Form>
                 <div>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
             </Container>

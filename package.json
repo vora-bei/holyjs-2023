@@ -1,14 +1,17 @@
 {
   "name": "vite-number-conversion",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "homepage": "https://vora-bei.github.io/holyjs-2023",
   "scripts": {
     "test": "jest",
     "dev": "vite",
-    "build": "tsc && vite build",
-    "predeploy": "npm run build",
+    "build": "npm run build",
+    "predeploy": "npm run index-build",
+    "postinstall": "npm run index-build",
     "deploy": "gh-pages -d dist",
+    "index-build": "npx ts-node-esm --project tsconfig.json -T index.build",
     "preview": "vite preview"
   },
   "dependencies": {
