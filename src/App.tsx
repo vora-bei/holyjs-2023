@@ -36,6 +36,7 @@ function App() {
     const [timeStart5, setTimeStart5] = useState<number>(0);
     const [timeStart6, setTimeStart6] = useState<number>(0);
     const [timeStart7, setTimeStart7] = useState<number>(0);
+    const [timeLoad9, setTimeLoad9] = useState<number>(0);
     const [search9Result, setSearch9Result] = useState<string[]>([]);
     const [film5Index, setFilm5Index] = useState<Set<string>[]>([]);
     const [film6Index, setFilm6Index] = useState<Map<string, Set<number>>>(new Map());
@@ -101,7 +102,9 @@ function App() {
     }, [search, films, search9Result, dataSize, engine]);
     useEffect(() => {
         (async () => {
+            const t02 = performance.now();
             setSearch9Result(await search9(search));
+            setTimeLoad9(Math.ceil(performance.now() - t02))
         })()
     }, [search, films])
     const resultCompared = useMemo(() => {
@@ -180,7 +183,7 @@ function App() {
             </tbody>
         </Table>
     }
-    const timeSearch = Math.ceil(t1 - t0)
+    const timeSearch = engine === 'n-gram spread index' ? timeLoad9 : Math.ceil(t1 - t0);
     return (
         <div className="App">
             <Container>
