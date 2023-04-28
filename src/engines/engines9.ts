@@ -47,7 +47,7 @@ function loadChunk(index: number) {
 }
 
 export const loadIndex = async (tokens: string[]) => {
-    if (!index) {
+    if (!index && tokens.length) {
         const time0 = performance.now();
         index = await fetch("index-slice.json")
             .then(res => {
