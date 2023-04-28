@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "dev": "vite",
-    "build": "npm run build",
+    "build": "tsc && vite build",
     "predeploy": "npm run index-build",
     "postinstall": "npm run index-build",
     "deploy": "gh-pages -d dist",

@@ -1,6 +1,6 @@
 import {useDeferredValue, useEffect, useMemo, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {HandIndexFill, HandThumbsDownFill, HandThumbsUpFill} from 'react-bootstrap-icons';
+import {HandIndexFill, HandThumbsDownFill, HandThumbsUpFill, CheckLg, X} from 'react-bootstrap-icons';
 
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -52,14 +52,17 @@ function App() {
             })
             .then(films => {
                 setFilms(films)
+
                 const t0 = performance.now();
                 setFilm5Index(createIndex5(films))
                 const t1 = performance.now();
                 setTimeStart5(Math.ceil(t1 - t0))
+
                 const t01 = performance.now();
                 setFilm6Index(createIndex6(films))
                 const t11 = performance.now();
                 setTimeStart6(Math.ceil(t11 - t01))
+
                 const t02 = performance.now();
                 setFilm7Index(createIndex7(films))
                 const t12 = performance.now();
@@ -106,13 +109,13 @@ function App() {
     }, [search, films, dataSize, engine]);
     const color = (film: string, resultSet: Set<string>, comparedSet: Set<string>) => {
         if (resultSet.has(film) && comparedSet.has(film)) {
-            return <HandThumbsUpFill color={"green"}/>
+            return <CheckLg size={30} color={"green"}/>
         }
         if (resultSet.has(film)) {
-            return <HandIndexFill color={"orange"}/>;
+            return <X size={30} color={"red"}/>;
         }
         if (comparedSet.has(film)) {
-            return <HandThumbsDownFill color={"red"}/>;
+            return <X size={30} color={"red"}/>;
         }
         return null;
     }
@@ -149,13 +152,13 @@ function App() {
         const others = films
             .filter(film => !resultSet.has(film) && !comparedSet.has(film))
         const resortResults = [...success, ...errors, ...extras, ...others];
-        return <Table striped bordered hover>
+        return <Table bordered hover>
             <thead>
             <tr>
                 <th>Фильм</th>
                 <th>{engine} алгоритм <Badge>{result.length}</Badge></th>
                 <th>Секретный алгоритм <Badge>{resultCompared.length}</Badge></th>
-                <th>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge></th>
+                <th className={'d-none d-md-block'} >Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge></th>
             </tr>
             </thead>
             <tbody>
@@ -165,10 +168,10 @@ function App() {
                     .map((film, i) =>
                         <tr key={i}>
                             <td width={'40%'}>{film}</td>
-                            <td align={"center"}>{resultSet.has(film) ? <HandThumbsUpFill color={"green"}/> : null}</td>
+                            <td align={"center"}>{resultSet.has(film) ? <CheckLg size={30} color={"green"}/> : null}</td>
                             <td align={"center"}>{comparedSet.has(film) ?
-                                <HandThumbsUpFill color={"green"}/> : null}</td>
-                            <td align={"center"}>
+                                <CheckLg size={30} color={"green"}/> : null}</td>
+                            <td className={'d-none d-md-block'} align={"center"}>
                                 {color(film, resultSet, comparedSet)}
                             </td>
                         </tr>
@@ -181,10 +184,10 @@ function App() {
     return (
         <div className="App">
             <Container>
-                <h1>Тестовый полигон</h1>
+                <h1 className={"text-center"}>Полигон</h1>
                 <Form>
-                    <Row>
-                        <Form.Group as={Col} controlId="formGridEmail">
+                    <Row className={'align-items-end'}>
+                        <Form.Group as={Col} md={6} controlId="formGridEmail" className={"mb-3 mt-3"} >
                             <Form.Label>Стратегия поиска</Form.Label>
                             <Form.Select defaultValue={engine}
                                          onChange={(e) => setEngine(e.currentTarget.value)}
@@ -200,7 +203,7 @@ function App() {
                                 <option value="n-gram spread index">n-gram cdn индекс</option>
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group as={Col}>
+                        <Form.Group as={Col}  md={6} className={"mb-3"}  >
                             <Form.Label>Показать</Form.Label>
                             <Form.Select defaultValue={dataSize}
                                          onChange={(e) => setDataSize(e.currentTarget.value)}
@@ -210,7 +213,7 @@ function App() {
                             </Form.Select>
                         </Form.Group>
                     </Row>
-                    <InputGroup className="mb-3 mt-3">
+                    <InputGroup className="mb-3 mt-3 md-4 xs-12">
                         <Form.Control
                             type={'search'}
                             placeholder="Поиск"
@@ -219,43 +222,36 @@ function App() {
                             onInput={(e) => setSearch(e.currentTarget.value)}
                         />
                     </InputGroup>
-                    <Row>
-                        <Form.Group as={Col}>
-                            <Form.Label>
+                    {dataSize !== 'little'?
+
+                    <Row className={"mb-3 mt-3"}>
+                        <Col sm={12} md={4}>
+                            <h3 style={{marginTop: "32px"}}>
+                                Старт
+                                <Badge className={"float-end"} bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
+                            </h3>
+                        </Col>
+                        <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
-                                    Время поиска <Badge
+                                    Искало <Badge
+                                    className={"float-end"}
                                     bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
                                 </Badge>
                                 </h3>
-                            </Form.Label>
-                        </Form.Group>
-                        <Form.Group as={Col}>
-                            <Form.Label>
-                                <h3 style={{marginTop: "32px"}}>
-                                    Время старта
-                                    {dataSize === 'little' ?
-                                        <Badge>1 ms</Badge> :
-                                        <Badge bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
-                                    }
-                                </h3>
-                            </Form.Label>
-                        </Form.Group>
-                        <Form.Group as={Col}>
-                            <Form.Label>
+                        </Col>
+                        <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
                                     Скачалось
-                                    {dataSize === 'little' ?
-                                        <Badge>0.1 KB</Badge> :
-                                        <Badge>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
+                                    {engine === 'n-gram spread index' ?
+                                        <Badge className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge>:
+                                        <Badge className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
                                     }
-                                    <Badge>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge>
 
                                 </h3>
-                            </Form.Label>
-                        </Form.Group>
-                    </Row>
+                        </Col>
+                    </Row>: null}
                 </Form>
-                <div>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
+                <div  className={"table-responsive"}>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
             </Container>
         </div>
     )
