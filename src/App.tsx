@@ -15,6 +15,7 @@ import {createIndex as createIndex7, search as search7} from './engines/engines7
 import {search as search8} from './engines/engines8';
 import {contentLength as contentLength9, loadSpreadIndex, search as search9} from './engines/engines9';
 import './App.css'
+import {getContentLength} from "./lib";
 
 const exampleFilms = [
     "Аватар",
@@ -62,7 +63,8 @@ function App() {
     useEffect(() => {
         fetch("films.json")
             .then(res => {
-                setContentLength(parseInt(res.headers.get("Content-Length") || "0"));
+                getContentLength(res)
+                    .then(size => setContentLength(size));
                 return res.json()
             })
             .then(films => {
@@ -120,10 +122,16 @@ function App() {
             case "lemming":
                 return search4(data, search)
             case "lemming pre-calculate":
+                if (!index5L.length)
+                    return []
                 return search5(index5L, data, search)
             case "lemming indexed":
+                if (!index6L.size)
+                    return []
                 return search6(index6L, data, search)
             case "n-gram indexed":
+                if (!index7L.size)
+                    return []
                 return search7(index7L, data, search)
             case "levenshtein":
                 return search8(data, search)
@@ -132,7 +140,7 @@ function App() {
             default:
                 return search1(data, search);
         }
-    }, [search, films, search9Result, dataSize, engine]);
+    }, [search, films, search9Result, dataSize, engine, film5Index, film6Index, film7Index]);
     useEffect(() => {
         (async () => {
             const t02 = performance.now();
@@ -223,7 +231,7 @@ function App() {
         <div className="App">
             <Container>
                 <h1 className={"text-center"}>Полигон</h1>
-                <Form>
+                <Form onSubmit={(e) => e.preventDefault()}>
                     <Row className={'align-items-end'}>
                         <Form.Group as={Col} md={6} className={"mb-3"}>
                             <Form.Label>Показать</Form.Label>
@@ -252,7 +260,12 @@ function App() {
                             placeholder="Поиск"
                             aria-label="Поиск"
                             defaultValue={search}
-                            onInput={(e) => setSearch(e.currentTarget.value)}
+                            onBlur={(e) => setSearch(e.currentTarget.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    setSearch(e.currentTarget.value);
+                                }
+                            }}
                         />
                     </InputGroup>
                     {dataSize !== 'little' ?
@@ -260,26 +273,40 @@ function App() {
                         <Row className={"mb-3 mt-3"}>
                             <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
-                                    Старт
-                                    <Badge className={"float-end"}
-                                           bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
+                                    {engine === 'n-gram spread index' ? "Старт (Сеть)" : "Старт (CPU)"}
+                                    {engine === 'n-gram spread index' ?
+                                        <Badge className={"float-end"}
+                                               bg={timeStart() > 200 ? "danger" : "success"}>{timeStart()} ms</Badge> :
+                                        <Badge className={"float-end"}
+                                               bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
+                                    }
                                 </h3>
                             </Col>
                             <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
-                                    Поиск <Badge
-                                    className={"float-end"}
-                                    bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
-                                </Badge>
-                                </h3>
-                            </Col>
-                            <Col sm={12} md={4}>
-                                <h3 style={{marginTop: "32px"}}>
-                                    Скачалось
+                                    {engine === 'n-gram spread index' ? "Поиск (Сеть)" : "Поиск (CPU)"}
                                     {engine === 'n-gram spread index' ?
                                         <Badge
+                                            className={"float-end"}
+                                            bg={timeSearch > 300 ? "danger" : "success"}>{timeSearch} ms
+                                        </Badge> :
+                                        <Badge
+                                            className={"float-end"}
+                                            bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
+                                        </Badge>
+
+                                    }
+                                </h3>
+                            </Col>
+                            <Col sm={12} md={4}>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Сеть
+                                    {engine === 'n-gram spread index' ?
+                                        <Badge
+                                            bg={(contentLength9 / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
                                             className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge> :
                                         <Badge
+                                            bg={(contentLength / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
                                             className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
                                     }
 

@@ -1,4 +1,5 @@
 import {stemmer} from 'stemmer-ru';
+import {getContentLength} from "../lib";
 
 const stemmerRu = new stemmer();
 
@@ -34,7 +35,8 @@ let indexes: Map<number, Map<string, Set<number>>> = new Map<number, Map<string,
 function loadChunk(index: number) {
     return fetch(`./index/index-${index}.json`)
         .then(res => {
-            contentLength += parseInt(res.headers.get("Content-Length") || "0")
+            getContentLength(res)
+                .then(size => contentLength += size);
             return res.json();
         })
         .then(res => res as { [name: string]: number[] })
@@ -51,14 +53,12 @@ function loadChunk(index: number) {
 export const loadSpreadIndex = async () => {
     if (!index) {
         const time0 = performance.now();
-        return await fetch("index-slice.json")
-            .then(res => {
-                contentLength = parseInt(res.headers.get("Content-Length") || "0")
-                const json = res.json();
-                timeStart = Math.ceil(performance.now() - time0);
-                return json;
-            })
-            .then(res => ({timeStart, res: res as [string, string][]}));
+        const res = await fetch("index-slice.json");
+        getContentLength(res)
+            .then(size => contentLength = size);
+        index = await res.json();
+        timeStart = Math.ceil(performance.now() - time0);
+        return ({timeStart, res: index})
     }
     return {timeStart, res: index};
 }
@@ -123,7 +123,8 @@ export const search = async (search: string) => {
         .map((dataId) => {
             return fetch(`./data/data-${dataId}.json`)
                 .then(res => {
-                    contentLength += parseInt(res.headers.get("Content-Length") || "0")
+                    getContentLength(res)
+                        .then(size => contentLength += size);
                     return res.json()
                 })
                 .then(res => ({data: res, id: dataId}))
