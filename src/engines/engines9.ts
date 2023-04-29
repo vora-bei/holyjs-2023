@@ -25,7 +25,7 @@ const tokenizr = (film: string) => {
 export let timeStart = 0;
 export let contentLength = 0;
 const LIMIT_CHUNK_INDEX = 20;
-const LIMIT_CHUNK_DATA = 20;
+const LIMIT_CHUNK_DATA = 30;
 let index: [string, string][];
 let data: { [name: string]: string } = {}
 const dataIds = new Set<number>();
@@ -48,17 +48,23 @@ function loadChunk(index: number) {
         });
 }
 
-export const loadIndex = async (tokens: string[]) => {
-    if (!index && tokens.length) {
+export const loadSpreadIndex = async () => {
+    if (!index) {
         const time0 = performance.now();
-        index = await fetch("index-slice.json")
+        return await fetch("index-slice.json")
             .then(res => {
                 contentLength = parseInt(res.headers.get("Content-Length") || "0")
                 const json = res.json();
                 timeStart = Math.ceil(performance.now() - time0);
                 return json;
             })
-            .then(res => res as [string, string][]);
+            .then(res => ({timeStart, res: res as [string, string][]}));
+    }
+    return {timeStart, res: index};
+}
+export const loadIndex = async (tokens: string[]) => {
+    if (!index && tokens.length) {
+        index = (await loadSpreadIndex()).res;
     }
     const chunkIds = tokens.flatMap((token) => {
         return index

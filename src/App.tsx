@@ -13,7 +13,7 @@ import {createIndex as createIndex5, search as search5} from './engines/engines5
 import {createIndex as createIndex6, search as search6} from './engines/engines6';
 import {createIndex as createIndex7, search as search7} from './engines/engines7';
 import {search as search8} from './engines/engines8';
-import {contentLength as contentLength9, search as search9, timeStart as timeStart9} from './engines/engines9';
+import {contentLength as contentLength9, loadSpreadIndex, search as search9} from './engines/engines9';
 import './App.css'
 
 const exampleFilms = [
@@ -49,6 +49,7 @@ function App() {
     const [timeStart5, setTimeStart5] = useState<number>(0);
     const [timeStart6, setTimeStart6] = useState<number>(0);
     const [timeStart7, setTimeStart7] = useState<number>(0);
+    const [timeStart9, setTimeStart9] = useState<number>(0);
     const [timeLoad9, setTimeLoad9] = useState<number>(0);
     const [search9Result, setSearch9Result] = useState<string[]>([]);
     const [film5Index, setFilm5Index] = useState<Set<string>[]>([]);
@@ -85,13 +86,23 @@ function App() {
         }
     }, [films.length, film6Index, engine])
     useEffect(() => {
-        if (films.length && !film7Index.size && engine === 'n-gram indexed') {
+        if (films.length && !film7Index.size) {
             const t01 = performance.now();
             setFilm7Index(createIndex7(films))
             const t11 = performance.now();
             setTimeStart7(Math.ceil(t11 - t01))
         }
-    }, [films.length, film7Index, engine])
+    }, [films.length, film7Index, engine]);
+    useEffect(() => {
+
+        if (engine === 'n-gram spread index') {
+            loadSpreadIndex()
+                .then(({timeStart}) => {
+                    setTimeStart9(timeStart)
+                })
+                .catch(r => console.error(r))
+        }
+    }, [engine])
 
     const t0 = performance.now();
     const result = useMemo(() => {
@@ -183,7 +194,7 @@ function App() {
                 <th>Фильм</th>
                 <th>{algorithms.find(({value}) => value === engine)?.label || null} <Badge>{result.length}</Badge></th>
                 <th>Секретный алгоритм <Badge>{resultCompared.length}</Badge></th>
-                <th className={'d-none d-md-block'}>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge>
+                <th className={'d-none d-md-table'}>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge>
                 </th>
             </tr>
             </thead>
@@ -198,7 +209,7 @@ function App() {
                                 <CheckLg size={30} color={"green"}/> : null}</td>
                             <td align={"center"}>{comparedSet.has(film) ?
                                 <CheckLg size={30} color={"green"}/> : null}</td>
-                            <td className={'d-none d-md-block'} align={"center"}>
+                            <td className={'d-none d-md-table'} align={"center"}>
                                 {color(film, resultSet, comparedSet)}
                             </td>
                         </tr>
@@ -214,6 +225,15 @@ function App() {
                 <h1 className={"text-center"}>Полигон</h1>
                 <Form>
                     <Row className={'align-items-end'}>
+                        <Form.Group as={Col} md={6} className={"mb-3"}>
+                            <Form.Label>Показать</Form.Label>
+                            <Form.Select defaultValue={dataSize}
+                                         onChange={(e) => setDataSize(e.currentTarget.value)}
+                                         aria-label="Данные">
+                                <option value="little">Срез данных</option>
+                                <option value="large">Все данные</option>
+                            </Form.Select>
+                        </Form.Group>
                         <Form.Group as={Col} md={6} controlId="formGridEmail" className={"mb-3 mt-3"}>
                             <Form.Label>Стратегия поиска</Form.Label>
                             <Form.Select defaultValue={engine}
@@ -223,15 +243,6 @@ function App() {
                                     algorithms.map(({label, value}) => <option key={value}
                                                                                value={value}>{label}</option>)
                                 }
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group as={Col} md={6} className={"mb-3"}>
-                            <Form.Label>Показать</Form.Label>
-                            <Form.Select defaultValue={dataSize}
-                                         onChange={(e) => setDataSize(e.currentTarget.value)}
-                                         aria-label="Данные">
-                                <option value="little">Срез данных</option>
-                                <option value="large">Все данные</option>
                             </Form.Select>
                         </Form.Group>
                     </Row>
@@ -256,7 +267,7 @@ function App() {
                             </Col>
                             <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
-                                    Искало <Badge
+                                    Поиск <Badge
                                     className={"float-end"}
                                     bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
                                 </Badge>
