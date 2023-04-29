@@ -14,9 +14,7 @@ const gramm3 = (word: string) => {
     }).filter(Boolean);
     return words;
 }
-const mkdir = util.promisify(fs.mkdir);
-const rmdir = util.promisify(fs.rmdir);
-const exists = util.promisify(fs.exists);
+
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 // @ts-ignore
@@ -64,7 +62,7 @@ export const splitIndex = (index: { [key: string]: number[] }) => {
     return chunks;
 }
 export const splitData = (films: string[]) => {
-    const chunkSize = 10;
+    const chunkSize = 100;
     const chunks: { [name: number]: string }[] = [];
     films.forEach((key, i) => {
         const chunkNumber = (i - i % chunkSize) / chunkSize

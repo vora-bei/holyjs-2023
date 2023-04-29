@@ -24,6 +24,8 @@ const tokenizr = (film: string) => {
 
 export let timeStart = 0;
 export let contentLength = 0;
+const LIMIT_CHUNK_INDEX = 20;
+const LIMIT_CHUNK_DATA = 20;
 let index: [string, string][];
 let data: { [name: string]: string } = {}
 const dataIds = new Set<number>();
@@ -37,7 +39,7 @@ function loadChunk(index: number) {
         })
         .then(res => res as { [name: string]: number[] })
         .then(res => {
-            const chunk = Object.keys(res).reduce((sum, key) => {
+            const chunk = Object.keys(res).slice(0, LIMIT_CHUNK_INDEX).reduce((sum, key) => {
                 sum.set(key, new Set(res[key]));
                 return sum;
             }, new Map<string, Set<number>>());
@@ -109,8 +111,9 @@ export const search = async (search: string) => {
     const totalWeight = getTotalWeight(weights)
     const sortedWeight = sortWeights(totalWeight);
     const orderedWeight = sortedWeight.filter(({index, weight}) => weight > Math.max(0, terms.length - 2));
-    const localDataIds = new Set(orderedWeight.map(({index}) => (index - (index % 10)) / 10).filter(i => !dataIds.has(i)));
+    const localDataIds = new Set(orderedWeight.map(({index}) => (index - (index % 100)) / 100).filter(i => !dataIds.has(i)));
     const dataList = await Promise.all([...localDataIds.keys()]
+        .slice(0, LIMIT_CHUNK_DATA)
         .map((dataId) => {
             return fetch(`./data/data-${dataId}.json`)
                 .then(res => {

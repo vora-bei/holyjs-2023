@@ -1,6 +1,6 @@
 import {useDeferredValue, useEffect, useMemo, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {HandIndexFill, HandThumbsDownFill, HandThumbsUpFill, CheckLg, X} from 'react-bootstrap-icons';
+import {CheckLg, X} from 'react-bootstrap-icons';
 
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -13,7 +13,7 @@ import {createIndex as createIndex5, search as search5} from './engines/engines5
 import {createIndex as createIndex6, search as search6} from './engines/engines6';
 import {createIndex as createIndex7, search as search7} from './engines/engines7';
 import {search as search8} from './engines/engines8';
-import {search as search9, timeStart as timeStart9, contentLength as contentLength9} from './engines/engines9';
+import {contentLength as contentLength9, search as search9, timeStart as timeStart9} from './engines/engines9';
 import './App.css'
 
 const exampleFilms = [
@@ -29,6 +29,19 @@ const exampleFilms = [
 const index7 = createIndex7(exampleFilms);
 const index6 = createIndex6(exampleFilms);
 const index5 = createIndex5(exampleFilms);
+
+
+const algorithms = [
+    {value: "simple", label: "Наивый вариант"},
+    {value: "lowercase", label: "Lowercase"},
+    {value: "stemming", label: "Стеминг"},
+    {value: "lemming", label: "Леметизация"},
+    {value: "lemming pre-calculate", label: "Леметизация предрасчет"},
+    {value: "lemming indexed", label: "Леметизация индекс"},
+    {value: "levenshtein", label: "Левенштейн"},
+    {value: "n-gram indexed", label: "N-gram индекс"},
+    {value: "n-gram spread index", label: "N-gram cdn индекс"}
+];
 
 function App() {
     const [films, setFilms] = useState<string[]>([]);
@@ -53,24 +66,33 @@ function App() {
             })
             .then(films => {
                 setFilms(films)
-
-                const t0 = performance.now();
-                setFilm5Index(createIndex5(films))
-                const t1 = performance.now();
-                setTimeStart5(Math.ceil(t1 - t0))
-
-                const t01 = performance.now();
-                setFilm6Index(createIndex6(films))
-                const t11 = performance.now();
-                setTimeStart6(Math.ceil(t11 - t01))
-
-                const t02 = performance.now();
-                setFilm7Index(createIndex7(films))
-                const t12 = performance.now();
-                setTimeStart7(Math.ceil(t12 - t02))
-
             })
     }, [])
+    useEffect(() => {
+        if (films.length && !film5Index.length && engine === 'lemming pre-calculate') {
+            const t0 = performance.now();
+            setFilm5Index(createIndex5(films))
+            const t1 = performance.now();
+            setTimeStart5(Math.ceil(t1 - t0))
+        }
+    }, [films.length, film5Index, engine])
+    useEffect(() => {
+        if (films.length && !film6Index.size && engine === 'lemming indexed') {
+            const t01 = performance.now();
+            setFilm6Index(createIndex6(films))
+            const t11 = performance.now();
+            setTimeStart6(Math.ceil(t11 - t01))
+        }
+    }, [films.length, film6Index, engine])
+    useEffect(() => {
+        if (films.length && !film7Index.size && engine === 'n-gram indexed') {
+            const t01 = performance.now();
+            setFilm7Index(createIndex7(films))
+            const t11 = performance.now();
+            setTimeStart7(Math.ceil(t11 - t01))
+        }
+    }, [films.length, film7Index, engine])
+
     const t0 = performance.now();
     const result = useMemo(() => {
         const data = dataSize === 'little' ? exampleFilms : films;
@@ -106,7 +128,7 @@ function App() {
             setSearch9Result(await search9(search));
             setTimeLoad9(Math.ceil(performance.now() - t02))
         })()
-    }, [search, films])
+    }, [search])
     const resultCompared = useMemo(() => {
         return search7(dataSize === 'little' ? index7 : film7Index, dataSize === 'little' ? exampleFilms : films, search)
     }, [search, films, dataSize, engine]);
@@ -159,9 +181,10 @@ function App() {
             <thead>
             <tr>
                 <th>Фильм</th>
-                <th>{engine} алгоритм <Badge>{result.length}</Badge></th>
+                <th>{algorithms.find(({value}) => value === engine)?.label || null} <Badge>{result.length}</Badge></th>
                 <th>Секретный алгоритм <Badge>{resultCompared.length}</Badge></th>
-                <th className={'d-none d-md-block'} >Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge></th>
+                <th className={'d-none d-md-block'}>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -171,7 +194,8 @@ function App() {
                     .map((film, i) =>
                         <tr key={i}>
                             <td width={'40%'}>{film}</td>
-                            <td align={"center"}>{resultSet.has(film) ? <CheckLg size={30} color={"green"}/> : null}</td>
+                            <td align={"center"}>{resultSet.has(film) ?
+                                <CheckLg size={30} color={"green"}/> : null}</td>
                             <td align={"center"}>{comparedSet.has(film) ?
                                 <CheckLg size={30} color={"green"}/> : null}</td>
                             <td className={'d-none d-md-block'} align={"center"}>
@@ -190,23 +214,18 @@ function App() {
                 <h1 className={"text-center"}>Полигон</h1>
                 <Form>
                     <Row className={'align-items-end'}>
-                        <Form.Group as={Col} md={6} controlId="formGridEmail" className={"mb-3 mt-3"} >
+                        <Form.Group as={Col} md={6} controlId="formGridEmail" className={"mb-3 mt-3"}>
                             <Form.Label>Стратегия поиска</Form.Label>
                             <Form.Select defaultValue={engine}
                                          onChange={(e) => setEngine(e.currentTarget.value)}
                                          aria-label="Стратегия поиска">
-                                <option value="simple">Наивый вариант</option>
-                                <option value="lowercase">Lowercase</option>
-                                <option value="stemming">Стеминг</option>
-                                <option value="lemming">Леметизация</option>
-                                <option value="lemming pre-calculate">Леметизация предрасчет</option>
-                                <option value="lemming indexed">Леметизация индекс</option>
-                                <option value="levenshtein">Левенштейн</option>
-                                <option value="n-gram indexed">n-gram индекс</option>
-                                <option value="n-gram spread index">n-gram cdn индекс</option>
+                                {
+                                    algorithms.map(({label, value}) => <option key={value}
+                                                                               value={value}>{label}</option>)
+                                }
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group as={Col}  md={6} className={"mb-3"}  >
+                        <Form.Group as={Col} md={6} className={"mb-3"}>
                             <Form.Label>Показать</Form.Label>
                             <Form.Select defaultValue={dataSize}
                                          onChange={(e) => setDataSize(e.currentTarget.value)}
@@ -225,36 +244,39 @@ function App() {
                             onInput={(e) => setSearch(e.currentTarget.value)}
                         />
                     </InputGroup>
-                    {dataSize !== 'little'?
+                    {dataSize !== 'little' ?
 
-                    <Row className={"mb-3 mt-3"}>
-                        <Col sm={12} md={4}>
-                            <h3 style={{marginTop: "32px"}}>
-                                Старт
-                                <Badge className={"float-end"} bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
-                            </h3>
-                        </Col>
-                        <Col sm={12} md={4}>
+                        <Row className={"mb-3 mt-3"}>
+                            <Col sm={12} md={4}>
+                                <h3 style={{marginTop: "32px"}}>
+                                    Старт
+                                    <Badge className={"float-end"}
+                                           bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
+                                </h3>
+                            </Col>
+                            <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
                                     Искало <Badge
                                     className={"float-end"}
                                     bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
                                 </Badge>
                                 </h3>
-                        </Col>
-                        <Col sm={12} md={4}>
+                            </Col>
+                            <Col sm={12} md={4}>
                                 <h3 style={{marginTop: "32px"}}>
                                     Скачалось
                                     {engine === 'n-gram spread index' ?
-                                        <Badge className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge>:
-                                        <Badge className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
+                                        <Badge
+                                            className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge> :
+                                        <Badge
+                                            className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
                                     }
 
                                 </h3>
-                        </Col>
-                    </Row>: null}
+                            </Col>
+                        </Row> : null}
                 </Form>
-                <div  className={"table-responsive"}>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
+                <div className={"table-responsive"}>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
             </Container>
         </div>
     )

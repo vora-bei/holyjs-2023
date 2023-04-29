@@ -8,9 +8,11 @@
     "test": "jest",
     "dev": "vite",
     "build": "tsc && vite build",
+    "build-github": "tsc && vite build --base=/holyjs-2023/",
     "predeploy": "npm run index-build",
     "postinstall": "npm run index-build",
-    "deploy": "gh-pages -d dist",
+    "deploy-github": "npm run build-github && gh-pages -d dist",
+    "deploy": "npm run build && gh-pages -d dist -b clouflare",
     "index-build": "npx ts-node-esm --project tsconfig.json -T index.build",
     "preview": "vite preview"
   },
