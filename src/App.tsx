@@ -213,7 +213,7 @@ function App() {
                     .slice(0, 1000)
                     .map((film, i) =>
                         <tr key={i}>
-                            <td width={'50%'}>{film}</td>
+                            <td width={'40%'}>{film}</td>
                             <td width={'20%'}>{resultSet.has(film) ?
                                 <CheckLg size={30} color={"green"}/> : null}</td>
                             <td width={'20%'}>{comparedSet.has(film) ?
@@ -234,7 +234,7 @@ function App() {
                 <h1>Полигон</h1>
                 <Form onSubmit={(e) => e.preventDefault()}>
                     <Row className={'align-items-end'}>
-                        <Form.Group as={Col} md={6} className={"mb-3"}>
+                        <Form.Group as={Col} md={6}>
                             <Form.Label>Показать</Form.Label>
                             <Form.Select defaultValue={dataSize}
                                          onChange={(e) => setDataSize(e.currentTarget.value)}
@@ -243,7 +243,7 @@ function App() {
                                 <option value="large">Все данные</option>
                             </Form.Select>
                         </Form.Group>
-                        <Form.Group as={Col} md={6} controlId="formGridEmail" className={"mb-3 mt-3"}>
+                        <Form.Group as={Col} md={6}  className={"mt-3"}>
                             <Form.Label>Стратегия поиска</Form.Label>
                             <Form.Select defaultValue={engine}
                                          onChange={(e) => setEngine(e.currentTarget.value)}
