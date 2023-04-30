@@ -1,6 +1,6 @@
 import {useDeferredValue, useEffect, useMemo, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {CheckLg, X} from 'react-bootstrap-icons';
+import {CheckLg, X, Search} from 'react-bootstrap-icons';
 
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -165,8 +165,8 @@ function App() {
     }
     const t1 = performance.now();
     const resultSet = new Set(result);
-    const missedCount = resultCompared.filter(film => !resultSet.has(film)).length;
-    const successCount = resultCompared.filter(film => resultSet.has(film)).length;
+    const missedCount = new Set(resultCompared.filter(film => !resultSet.has(film))).size;
+    const successCount = new Set(resultCompared.filter(film => resultSet.has(film))).size;
     const timeStart = () => {
         if (dataSize === 'little') {
             return 1;
@@ -186,6 +186,7 @@ function App() {
     }
     const bigRender = (films: string[]) => {
         const resultSet = new Set(result);
+        console.log(result);
         const comparedSet = new Set(resultCompared);
         const success = films
             .filter(film => resultSet.has(film) && comparedSet.has(film))
@@ -196,13 +197,13 @@ function App() {
         const others = films
             .filter(film => !resultSet.has(film) && !comparedSet.has(film))
         const resortResults = [...success, ...errors, ...extras, ...others];
-        return <Table bordered hover>
+        return <Table hover>
             <thead>
             <tr>
                 <th>Фильм</th>
-                <th>{algorithms.find(({value}) => value === engine)?.label || null} <Badge>{result.length}</Badge></th>
-                <th>Секретный алгоритм <Badge>{resultCompared.length}</Badge></th>
-                <th className={'d-none d-md-table'}>Совпадения <Badge>{successCount} из {successCount + missedCount}</Badge>
+                <th><div>{algorithms.find(({value}) => value === engine)?.label || null}</div> <Badge>{resultSet.size}</Badge></th>
+                <th><div>Секретный алгоритм</div> <Badge>{comparedSet.size}</Badge></th>
+                <th className={'d-none d-md-table'}><div>Совпадения</div> <Badge>{successCount} из {successCount + missedCount}</Badge>
                 </th>
             </tr>
             </thead>
@@ -212,12 +213,12 @@ function App() {
                     .slice(0, 1000)
                     .map((film, i) =>
                         <tr key={i}>
-                            <td width={'40%'}>{film}</td>
-                            <td align={"center"}>{resultSet.has(film) ?
+                            <td width={'50%'}>{film}</td>
+                            <td width={'20%'}>{resultSet.has(film) ?
                                 <CheckLg size={30} color={"green"}/> : null}</td>
-                            <td align={"center"}>{comparedSet.has(film) ?
+                            <td width={'20%'}>{comparedSet.has(film) ?
                                 <CheckLg size={30} color={"green"}/> : null}</td>
-                            <td className={'d-none d-md-table'} align={"center"}>
+                            <td width={'10%'} className={'d-none d-md-table'}>
                                 {color(film, resultSet, comparedSet)}
                             </td>
                         </tr>
@@ -230,7 +231,7 @@ function App() {
     return (
         <div className="App">
             <Container>
-                <h1 className={"text-center"}>Полигон</h1>
+                <h1>Полигон</h1>
                 <Form onSubmit={(e) => e.preventDefault()}>
                     <Row className={'align-items-end'}>
                         <Form.Group as={Col} md={6} className={"mb-3"}>
@@ -267,6 +268,7 @@ function App() {
                                 }
                             }}
                         />
+                        <InputGroup.Text><Search /></InputGroup.Text>
                     </InputGroup>
                     {dataSize !== 'little' ?
 

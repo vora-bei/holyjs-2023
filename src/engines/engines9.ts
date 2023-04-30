@@ -136,5 +136,5 @@ export const search = async (search: string) => {
 
     return orderedWeight.map((row) => {
         return data[row.index];
-    })
+    }).filter(Boolean)
 }
