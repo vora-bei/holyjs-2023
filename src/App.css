@@ -1,6 +1,52 @@
-#root {
-    max-width: 1280px;
-    margin: 0 auto;
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.nikita {
+    width: 42px;
+    height: 42px;
+    background: url("/nikita.png");
+    border: 1.8px solid #F644D1;
+    border-radius: 12764px;
+}
+
+.navbar-custom {
+    background: #010A12;
+    opacity: 0.8;
+    z-index: 2;
+    border-bottom: 1px solid #1C252D;
+}
+
+.paralax {
+    margin-top: -70px;
+    background-color: #010A12;
+}
+
+.title {
+    font-style: normal;
+    font-weight: 900;
+    font-size: 64px;
+    line-height: 78px;
+    /* identical to box height */
+
+    letter-spacing: 0.02em;
+
+    color: #FFFFFF;
+}
+
+.subtitle {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 140%;
+    /* identical to box height, or 34px */
+
+
+    color: #FFFFFF;
+}
+
+.margin-header {
+    margin-top: 145px;
 }
 
 .logo {

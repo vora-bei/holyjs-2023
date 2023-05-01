@@ -5,7 +5,7 @@ export const getContentLength = async (res: Response)=>{
     const isGzipped=!!res.headers.get("content-encoding")
     const length = (await res.clone().arrayBuffer()).byteLength;
     if(isGzipped){
-        return length / 3;
+        return length / Math.PI;
     }
     return length;
 }

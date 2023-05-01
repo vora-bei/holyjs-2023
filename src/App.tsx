@@ -1,9 +1,11 @@
 import {useDeferredValue, useEffect, useMemo, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {CheckLg, X, Search} from 'react-bootstrap-icons';
-
+import {CheckLg, Search, X} from 'react-bootstrap-icons';
+import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import {Parallax} from 'react-parallax';
 import {Badge, Col, Container, Row, Table} from 'react-bootstrap';
 import {search as search1} from './engines/engines1';
 import {search as search2} from './engines/engines2';
@@ -21,11 +23,13 @@ const exampleFilms = [
     "Аватар",
     "Джон уик",
     "Матрица: Перезагрузка",
-    "Смурфики. Волшебная игла портного",
-    "Особо опасен 1",
-    "Особо опасен 2",
-    "Особо опасен 3",
-    "Поющее звенящее деревце"
+    "Криминальное чтиво",
+    "Помни",
+    "Волк с Уолл-стрит",
+    "Властелин колец: Возвращение короля",
+    "Интерстеллар",
+    "Назад в будущее",
+    "Иван Васильевич меняет профессию"
 ];
 const index7 = createIndex7(exampleFilms);
 const index6 = createIndex6(exampleFilms);
@@ -186,7 +190,6 @@ function App() {
     }
     const bigRender = (films: string[]) => {
         const resultSet = new Set(result);
-        console.log(result);
         const comparedSet = new Set(resultCompared);
         const success = films
             .filter(film => resultSet.has(film) && comparedSet.has(film))
@@ -200,10 +203,38 @@ function App() {
         return <Table hover>
             <thead>
             <tr>
-                <th>Фильм</th>
-                <th><div>{algorithms.find(({value}) => value === engine)?.label || null}</div> <Badge>{resultSet.size}</Badge></th>
-                <th><div>Секретный алгоритм</div> <Badge>{comparedSet.size}</Badge></th>
-                <th className={'d-none d-md-table'}><div>Совпадения</div> <Badge>{successCount} из {successCount + missedCount}</Badge>
+                <th>
+                    <NavDropdown
+                        title={dataSize === "little" ? "Срез данных" : "Все данные"}
+                        defaultValue={dataSize}
+                    >
+                        <NavDropdown.Item
+                            data-value="little"
+                            onClick={(e) => setDataSize("little")}>
+                            Срез данных
+                        </NavDropdown.Item>
+                        <NavDropdown.Item
+                            onClick={(e) => setDataSize("large")}>
+                            Все данные
+                        </NavDropdown.Item>
+                    </NavDropdown>
+                    <div style={{color: "#CBCBCB"}}>
+                        {dataSize === "little" ? "10" : "100 000"}
+                    </div>
+                </th>
+                <th>
+                    <NavDropdown
+                        title={algorithms.find((e) => e.value === engine)?.label}
+                        defaultValue={dataSize}
+                    >
+                        {
+                            algorithms.map(({label, value}) => <NavDropdown.Item
+                                onClick={(e) => setEngine(value)}>
+                                {label}
+                            </NavDropdown.Item>)
+                        }
+                    </NavDropdown>
+                    <Badge bg={"secondary"}>{successCount} из {successCount + missedCount}</Badge>
                 </th>
             </tr>
             </thead>
@@ -213,12 +244,8 @@ function App() {
                     .slice(0, 1000)
                     .map((film, i) =>
                         <tr key={i}>
-                            <td width={'40%'}>{film}</td>
-                            <td width={'20%'}>{resultSet.has(film) ?
-                                <CheckLg size={30} color={"green"}/> : null}</td>
-                            <td width={'20%'}>{comparedSet.has(film) ?
-                                <CheckLg size={30} color={"green"}/> : null}</td>
-                            <td width={'10%'} className={'d-none d-md-table'}>
+                            <td width={'95%'}>{film}</td>
+                            <td width={'5%'} align={"right"}>
                                 {color(film, resultSet, comparedSet)}
                             </td>
                         </tr>
@@ -229,96 +256,102 @@ function App() {
     }
     const timeSearch = engine === 'n-gram spread index' ? timeLoad9 : Math.ceil(t1 - t0);
     return (
-        <div className="App">
-            <Container>
-                <h1>Полигон</h1>
-                <Form onSubmit={(e) => e.preventDefault()}>
-                    <Row className={'align-items-end'}>
-                        <Form.Group as={Col} md={6}>
-                            <Form.Label>Показать</Form.Label>
-                            <Form.Select defaultValue={dataSize}
-                                         onChange={(e) => setDataSize(e.currentTarget.value)}
-                                         aria-label="Данные">
-                                <option value="little">Срез данных</option>
-                                <option value="large">Все данные</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group as={Col} md={6}  className={"mt-3"}>
-                            <Form.Label>Стратегия поиска</Form.Label>
-                            <Form.Select defaultValue={engine}
-                                         onChange={(e) => setEngine(e.currentTarget.value)}
-                                         aria-label="Стратегия поиска">
-                                {
-                                    algorithms.map(({label, value}) => <option key={value}
-                                                                               value={value}>{label}</option>)
+        <>
+            <Navbar className={"navbar-custom"}>
+                <Container fluid={"lg"}>
+                    <Navbar.Brand><img className={"nikita"} src={"nikita.png"}/></Navbar.Brand>
+                </Container>
+            </Navbar>
+            <>
+                <div className={"paralax"}>
+                    <Container fluid={"xl"}>
+                        <Parallax bgImage={"/holyjs_2023_spring_hero_bg 5.png"} >
+                            <div style={{height: 315}}>
+                                <Container>
+                                    <Row className={"margin-header justify-content-md-center"}>
+                                        <Col md={9}>
+                                            <h1 className={"title"}>Нечеткий поиск</h1>
+                                            <h2 className={"subtitle"}>Построение индекса на CDN</h2>
+                                            <Form onSubmit={(e) => e.preventDefault()}>
+                                                <InputGroup className="mb-3 mt-3 md-4 xs-12">
+                                                    <Form.Control
+                                                        type={'search'}
+                                                        placeholder="Поиск"
+                                                        aria-label="Поиск"
+                                                        defaultValue={search}
+                                                        onBlur={(e) => setSearch(e.currentTarget.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                setSearch(e.currentTarget.value);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <InputGroup.Text><Search/></InputGroup.Text>
+                                                </InputGroup>
+                                            </Form>
+                                        </Col>
+                                    </Row>
+
+
+                                </Container>
+                            </div>
+                        </Parallax>
+                    </Container>
+
+                </div>
+                <Container fluid={"xxl"}>
+                    <Row className={"mb-3 mt-3 justify-content-md-center"} >
+                        <Col sm={12} md={3}>
+                            <h3 style={{marginTop: "32px"}}>
+                                {engine === 'n-gram spread index' ? "Старт (Сеть)" : "Старт (CPU)"}
+                                {engine === 'n-gram spread index' ?
+                                    <Badge className={"float-end"}
+                                           bg={timeStart() > 200 ? "danger" : "success"}>{timeStart()} ms</Badge> :
+                                    <Badge className={"float-end"}
+                                           bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
                                 }
-                            </Form.Select>
-                        </Form.Group>
+                            </h3>
+                        </Col>
+                        <Col sm={12} md={3}>
+                            <h3 style={{marginTop: "32px"}}>
+                                {engine === 'n-gram spread index' ? "Поиск (Сеть)" : "Поиск (CPU)"}
+                                {engine === 'n-gram spread index' ?
+                                    <Badge
+                                        className={"float-end"}
+                                        bg={timeSearch > 300 ? "danger" : "success"}>{timeSearch} ms
+                                    </Badge> :
+                                    <Badge
+                                        className={"float-end"}
+                                        bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
+                                    </Badge>
+
+                                }
+                            </h3>
+                        </Col>
+                        <Col sm={12} md={3}>
+                            <h3 style={{marginTop: "32px"}}>
+                                Сеть
+                                {engine === 'n-gram spread index' ?
+                                    <Badge
+                                        bg={(contentLength9 / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
+                                        className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge> :
+                                    <Badge
+                                        bg={(contentLength / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
+                                        className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
+                                }
+
+                            </h3>
+                        </Col>
                     </Row>
-                    <InputGroup className="mb-3 mt-3 md-4 xs-12">
-                        <Form.Control
-                            type={'search'}
-                            placeholder="Поиск"
-                            aria-label="Поиск"
-                            defaultValue={search}
-                            onBlur={(e) => setSearch(e.currentTarget.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    setSearch(e.currentTarget.value);
-                                }
-                            }}
-                        />
-                        <InputGroup.Text><Search /></InputGroup.Text>
-                    </InputGroup>
-                    {dataSize !== 'little' ?
-
-                        <Row className={"mb-3 mt-3"}>
-                            <Col sm={12} md={4}>
-                                <h3 style={{marginTop: "32px"}}>
-                                    {engine === 'n-gram spread index' ? "Старт (Сеть)" : "Старт (CPU)"}
-                                    {engine === 'n-gram spread index' ?
-                                        <Badge className={"float-end"}
-                                               bg={timeStart() > 200 ? "danger" : "success"}>{timeStart()} ms</Badge> :
-                                        <Badge className={"float-end"}
-                                               bg={timeStart() > 50 ? "danger" : "success"}>{timeStart()} ms</Badge>
-                                    }
-                                </h3>
-                            </Col>
-                            <Col sm={12} md={4}>
-                                <h3 style={{marginTop: "32px"}}>
-                                    {engine === 'n-gram spread index' ? "Поиск (Сеть)" : "Поиск (CPU)"}
-                                    {engine === 'n-gram spread index' ?
-                                        <Badge
-                                            className={"float-end"}
-                                            bg={timeSearch > 300 ? "danger" : "success"}>{timeSearch} ms
-                                        </Badge> :
-                                        <Badge
-                                            className={"float-end"}
-                                            bg={timeSearch > 50 ? "danger" : "success"}>{timeSearch} ms
-                                        </Badge>
-
-                                    }
-                                </h3>
-                            </Col>
-                            <Col sm={12} md={4}>
-                                <h3 style={{marginTop: "32px"}}>
-                                    Сеть
-                                    {engine === 'n-gram spread index' ?
-                                        <Badge
-                                            bg={(contentLength9 / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
-                                            className={"float-end"}>{Math.ceil(contentLength9 / 1024 / 1024 * 100) / 100} MB</Badge> :
-                                        <Badge
-                                            bg={(contentLength / 1024 / 1024 * 100) / 100 > 1 ? "danger" : "success"}
-                                            className={"float-end"}>{Math.ceil(contentLength / 1024 / 1024 * 100) / 100} MB</Badge>
-                                    }
-
-                                </h3>
-                            </Col>
-                        </Row> : null}
-                </Form>
-                <div className={"table-responsive"}>{bigRender(dataSize === 'little' ? exampleFilms : films)}</div>
-            </Container>
-        </div>
+                    <Row className={"justify-content-md-center"}>
+                        <Col md={9}
+                             className={"table-responsive justify-content-md-center"}>
+                            {bigRender(dataSize === 'little' ? exampleFilms : films)}
+                        </Col>
+                    </Row>
+                </Container>
+            </>
+        </>
     )
 }
 
