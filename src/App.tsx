@@ -6,7 +6,6 @@ import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import {Parallax} from 'react-parallax';
 import {Col, Container, Row, Table} from 'react-bootstrap';
 import {search as search1} from './engines/engines1';
 import {search as search2} from './engines/engines2';
@@ -172,7 +171,6 @@ function App() {
     const resultSet = new Set(result);
     const missedCount = new Set(resultCompared.filter(film => !resultSet.has(film))).size;
     const successCount = new Set(resultCompared.filter(film => resultSet.has(film))).size;
-    const len = dataSize === 'little' ? exampleFilms.length : films.length;
     const timeStart = () => {
         if (dataSize === 'little') {
             return 1;
@@ -310,9 +308,8 @@ function App() {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <div className={"paralax"}>
-                <Container fluid={"xl"}>
-                    <Parallax bgImage={"/holyjs_2023_spring_hero_bg 5.png"}>
+            <div className={"parallax-container"}>
+                    <div className={"parallax"}>
                         <div className={"header-page"}>
                             <Container>
                                 <Row className={"margin-header justify-content-md-center"}>
@@ -345,9 +342,7 @@ function App() {
 
                             </Container>
                         </div>
-                    </Parallax>
-                </Container>
-
+                    </div>
             </div>
             <Container className={"mt-5"}>
                 <Row className={"justify-content-md-center"}>

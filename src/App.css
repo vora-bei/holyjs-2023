@@ -118,9 +118,22 @@ th {
     border-bottom: 1px solid #1C252D;
 }
 
-.paralax {
+.parallax-container {
     margin-top: -70px;
     background-color: #010A12;
+}
+.parallax {
+    /* The image used */
+    background-image: url("/holyjs_2023_spring_hero_bg 5.png");
+
+    /* Set a specific height */
+    min-height: 500px;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .badge-2B2A32 {
@@ -158,31 +171,7 @@ th {
 }
 
 .margin-header {
-    margin-top: 145px;
-}
-
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-}
-
-.logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    padding-top: 145px;
 }
 
 
@@ -196,9 +185,6 @@ th {
     padding: 2em;
 }
 
-.read-the-docs {
-    color: #888;
-}
 
 @media screen and (max-width: 1200px) {
     .header-page {
