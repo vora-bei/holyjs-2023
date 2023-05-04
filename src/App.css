@@ -1,13 +1,114 @@
 body {
     font-family: 'Montserrat', sans-serif;
+    font-size: 25px;
+}
+
+.navbar-custom-container {
+    max-width: 1200px;
+}
+
+.dropdown-toggle::after {
+    vertical-align: 0.100em;
+}
+
+.form-control-lg {
+    font-size: 1.75rem;
+}
+
+.dropdown-menu {
+    font-size: 1.5rem;
+}
+
+th {
+    vertical-align: top;
+}
+
+.length {
+    color: #CBCBCB;
+    padding: 2px 8px;
 }
 
 .nikita {
     width: 42px;
     height: 42px;
     background: url("/nikita.png");
-    border: 1.8px solid #F644D1;
+    border: 2px solid #F644D1;
     border-radius: 12764px;
+}
+
+.fio {
+    margin: 0 15px 0 15px;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    color: #FFFFFF;
+}
+
+.link-social {
+    color: #FFFFFF;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.factoids {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.factoid-item {
+    padding: 15px 20px;
+    width: 145px;
+    background: #F5F5F5;
+    border-radius: 12px;
+}
+
+.factoid-item-value {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 28px;
+}
+
+.factoid-item-measure {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 28px;
+}
+
+.factoid-success {
+    color: #08B562;
+}
+
+.factoid-error {
+    color: #E82080;
+}
+
+.factoid-item-metric {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 28px;
+}
+
+.header-page {
+    height: 315px;
+}
+
+.org {
+    font-style: normal;
+    margin: 0 15px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+    /* identical to box height */
+
+
+    color: #999999;
 }
 
 .navbar-custom {
@@ -22,13 +123,24 @@ body {
     background-color: #010A12;
 }
 
+.badge-2B2A32 {
+    white-space: nowrap;
+    border-radius: 8px;
+    padding: 2px 8px;
+    display: inline-block;
+    color: white;
+    background-color: #2B2A32 !important;
+    height: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 26px;
+}
+
 .title {
     font-style: normal;
     font-weight: 900;
     font-size: 64px;
     line-height: 78px;
-    /* identical to box height */
-
     letter-spacing: 0.02em;
 
     color: #FFFFFF;
@@ -73,11 +185,6 @@ body {
     }
 }
 
-@media (min-width: 768px) {
-    .d-md-table {
-        display: table-cell !important;
-    }
-}
 
 @media (prefers-reduced-motion: no-preference) {
     a:nth-of-type(2) .logo {
@@ -91,4 +198,47 @@ body {
 
 .read-the-docs {
     color: #888;
+}
+
+@media screen and (max-width: 1200px) {
+    .header-page {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    body {
+        font-size: 15px;
+    }
+
+    .factoids {
+        margin-top: 50px;
+        margin-bottom: 20px;
+        position: sticky;
+        flex-direction: row;
+        bottom: 20px;
+        background-color: white;
+    }
+
+    .dropdown-menu {
+        font-size: 1rem;
+    }
+    .title {
+        font-size: 40px;
+        line-height: 46px;
+        letter-spacing: 0.02em;
+
+        color: #FFFFFF;
+    }
+
+    .subtitle {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 140%;
+        /* identical to box height, or 34px */
+
+
+        color: #FFFFFF;
+    }
 }

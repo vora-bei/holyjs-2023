@@ -54,7 +54,7 @@ const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index:
 
 export const search = (index: Map<string, Set<number>>, films: string[], search: string) => {
     if(search===''){
-        return films;
+        return [];
     }
     const terms = tokenizr(search);
     const weights = getWeights(terms, index);

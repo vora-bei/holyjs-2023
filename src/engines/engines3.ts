@@ -1,10 +1,10 @@
 const tokenizr= (film: string) => film
     .toLocaleLowerCase()
-    .split(/[\s.,!?]/)
+    .split(/[\s.,!?:;]/)
 
 export const search = (films: string[], search: string) => {
     if(!search || !search.length){
-        return films;
+        return [];
     }
     const terms = tokenizr(search);
     return films.filter(film => {

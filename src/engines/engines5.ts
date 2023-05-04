@@ -11,6 +11,9 @@ export const createIndex: (films: string[]) => Set<string>[] = (films: string[])
     films.map(film=> new Set<string>(tokenizr(film)));
 
 export const search = (index: Set<string>[], films: string[], search: string) => {
+    if(!search || !search.length){
+        return [];
+    }
     const terms = tokenizr(search)
     return films.filter((film, i) => {
         return terms.every(term => index[i].has(term))
