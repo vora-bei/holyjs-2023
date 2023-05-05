@@ -25,7 +25,8 @@ th {
 
 .length {
     color: #CBCBCB;
-    padding: 2px 8px;
+    padding: 2px 0px;
+    font-size: 22px;
 }
 
 .nikita {
@@ -127,7 +128,7 @@ th {
     background-image: url("/holyjs_2023_spring_hero_bg 5.png");
 
     /* Set a specific height */
-    min-height: 500px;
+    min-height: 460px;
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -144,6 +145,7 @@ th {
     color: white;
     background-color: #2B2A32 !important;
     height: 32px;
+    font-size: 22px;
     font-style: normal;
     font-weight: 700;
     line-height: 26px;

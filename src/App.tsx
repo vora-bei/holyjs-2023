@@ -269,8 +269,13 @@ function App() {
             </tbody>
         </Table>
     }
-    const timeSearch = engine === 'n-gram spread index' ? timeLoad9 : Math.ceil(t1 - t0);
-
+    const timeSearchCalc = () => {
+        if (dataSize === 'little') {
+            return Math.ceil(t1 - t0)
+        }
+        return engine === 'n-gram spread index' ? timeLoad9 : Math.ceil(t1 - t0);
+    }
+    const timeSearch = timeSearchCalc();
     const factoid1 = (engine: string, time: number) => {
         if (engine === 'n-gram spread index') {
             return time > 200 ? "factoid-error" : "factoid-success"
