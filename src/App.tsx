@@ -52,6 +52,7 @@ function App() {
     const [films, setFilms] = useState<string[]>([]);
     const [contentLength, setContentLength] = useState<number>(0);
     const [timeStart5, setTimeStart5] = useState<number>(0);
+    const [timeStartNetwork, setTimeStartNetwork] = useState<number>(0);
     const [timeStart6, setTimeStart6] = useState<number>(0);
     const [timeStart7, setTimeStart7] = useState<number>(0);
     const [timeStart9, setTimeStart9] = useState<number>(0);
@@ -64,14 +65,18 @@ function App() {
     const [engine, setEngine] = useState("simple");
     const [dataSize, setDataSize] = useState("little");
     const search = useDeferredValue(localSearch)
+
     useEffect(() => {
+        const now1 = performance.now();
         fetch("films.json")
             .then(res => {
+
                 getContentLength(res)
                     .then(size => setContentLength(size));
                 return res.json()
             })
             .then(films => {
+                setTimeStartNetwork(Math.ceil(performance.now() - now1));
                 setFilms(films)
             })
     }, [])
@@ -188,6 +193,15 @@ function App() {
                 return 1;
         }
     }
+    const timeStartNetworkCalc = () => {
+        if (dataSize === 'little') {
+            return 1;
+        }
+        if (engine === "n-gram spread index") {
+            return timeStart9;
+        }
+        return timeStartNetwork;
+    }
     const bigRender = (films: string[]) => {
         const resultSet = new Set(result);
         const comparedSet = new Set(resultCompared);
@@ -224,6 +238,7 @@ function App() {
                 </th>
                 <th>
                     <NavDropdown
+                        className={"algorithms-navbar"}
                         title={algorithms.find((e) => e.value === engine)?.label}
                         defaultValue={dataSize}
                     >
@@ -284,6 +299,15 @@ function App() {
         }
         return Math.ceil(size / 1024 / 1024 * 100) / 100;
     }
+    const timeStartDescription = () => {
+        if (engine === 'n-gram spread index') {
+            return "Старт, Сеть";
+        }
+        if (timeStartNetworkCalc() > timeStart()) {
+            return "Старт, Сеть";
+        }
+        return "Старт, CPU";
+    }
     return (
         <>
             <Navbar variant={"dark"} className={"navbar-custom"}>
@@ -298,53 +322,61 @@ function App() {
                     <Navbar.Collapse className="justify-content-end">
                         <Navbar.Text>
                             <a className={"mx-3 link-social"} href={"https://github.com/vora-bei/holyjs-2023"}>
-                                <Github color={"white"}/> <span className={"align-middle d-sm-inline-block d-none"}>Github</span>
+                                <Github color={"white"}/> <span
+                                className={"align-middle d-sm-inline-block d-none"}>Github</span>
                             </a>
                             <a className={"mx-2 link-social"}
-                               href={"https://github.com/vora-bei/holyjs-2023"}>
-                                <Linkedin color={"white"}/> <span className={"align-middle d-sm-inline-block d-none"}>Linkedin</span>
+                               href={"https://ru.linkedin.com/comm/in/nikita-vorobyev-996b5b54"}>
+                                <Linkedin color={"white"}/> <span
+                                className={"align-middle d-sm-inline-block d-none"}>Linkedin</span>
                             </a>
                         </Navbar.Text>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
             <div className={"parallax-container"}>
-                    <div className={"parallax"}>
-                        <div className={"header-page"}>
-                            <Container>
-                                <Row className={"margin-header justify-content-md-center"}>
-                                    <Col md={9}>
-                                        <h1 className={"title mb-3"}>Нечеткий поиск <img src={holyjsUrl} alt="HolyJs"/>
-                                        </h1>
-                                        <h2 className={"subtitle  mb-5"}>Построение индекса на CDN</h2>
-                                        <Form onSubmit={(e) => e.preventDefault()}>
-                                            <InputGroup className="mb-3 mt-3 md-4 xs-12">
-                                                <Form.Control
-                                                    type={'search'}
-                                                    placeholder="Поиск..."
-                                                    aria-label="Поиск"
-                                                    size="lg"
-                                                    defaultValue={search}
-                                                    onBlur={(e) => setSearch(e.currentTarget.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            setSearch(e.currentTarget.value);
-                                                        }
-                                                    }}
-                                                />
-                                                <InputGroup.Text><Search/></InputGroup.Text>
-                                            </InputGroup>
+                <div className={"parallax"}>
+                    <div className={"header-page"}>
+                        <Container>
+                            <Row className={"margin-header justify-content-md-center"}>
+                                <Col md={9}>
+                                    <Row>
+                                        <Col xs={8}>
+                                            <h1 className={"title mb-3"}>Нечеткий поиск</h1>
+                                        </Col>
+                                        <Col xs={1}>
+                                            <img src={holyjsUrl} alt="HolyJs"/>
+                                        </Col>
+                                    </Row>
+                                    <h2 className={"subtitle  mb-5"}>Построение индекса на CDN</h2>
+                                    <Form onSubmit={(e) => e.preventDefault()}>
+                                        <InputGroup className="mb-3 mt-3 md-4 xs-12">
+                                            <Form.Control
+                                                type={'search'}
+                                                placeholder="Поиск..."
+                                                aria-label="Поиск"
+                                                size="lg"
+                                                defaultValue={search}
+                                                onBlur={(e) => setSearch(e.currentTarget.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        setSearch(e.currentTarget.value);
+                                                    }
+                                                }}
+                                            />
+                                            <InputGroup.Text><Search/></InputGroup.Text>
+                                        </InputGroup>
 
-                                        </Form>
-                                    </Col>
-                                </Row>
+                                    </Form>
+                                </Col>
+                            </Row>
 
 
-                            </Container>
-                        </div>
+                        </Container>
                     </div>
+                </div>
             </div>
-            <Container className={"mt-5"}>
+            <Container className={"mt-5 content"}>
                 <Row className={"justify-content-md-center"}>
                     <Col lg={7}
                          className={"table-responsive justify-content-md-center"}>
@@ -354,10 +386,11 @@ function App() {
                         <div className={"factoid-item"}>
                             <div
                                 className={"factoid-item-value " + (factoid1(engine, timeStart()))}>
-                                {timeStart()} <span className={"factoid-item-measure"}>ms</span>
+                                {Math.max(timeStart(), timeStartNetworkCalc())} <span
+                                className={"factoid-item-measure"}>ms</span>
                             </div>
                             <div className={"factoid-item-metric"}>
-                                {engine === 'n-gram spread index' ? "Старт, Сеть" : "Старт, CPU"}
+                                {timeStartDescription()}
                             </div>
                         </div>
                         <div className={"factoid-item"}>

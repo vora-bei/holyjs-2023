@@ -131,7 +131,7 @@ th {
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
-    background-position: center;
+    background-position: top;
     background-repeat: no-repeat;
     background-size: contain;
 }
@@ -199,11 +199,19 @@ th {
 
     .factoids {
         margin-top: 50px;
-        margin-bottom: 20px;
-        position: sticky;
+        margin-bottom: 10px;
+        position: fixed;
+        align-items: stretch;
         flex-direction: row;
         bottom: 20px;
         background-color: white;
+    }
+    .factoid-item-metric{
+        font-size: 12px;
+    }
+    .factoid-item-value {
+        font-weight: 700;
+        /*font-size: 18px;*/
     }
 
     .dropdown-menu {
@@ -226,5 +234,16 @@ th {
 
 
         color: #FFFFFF;
+    }
+    .form-control-lg {
+        font-size: 1.5rem;
+    }
+    .algorithms-navbar > .nav-link{
+        width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .content{
+        margin-bottom: 150px;
     }
 }
