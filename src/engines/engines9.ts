@@ -6,7 +6,7 @@ const stemmerRu = new stemmer();
 const gramm3 = (word: string) => {
     const words = [...(" " + word)].map((w: string, i: number, array: string[]) => {
         if (i - 2 >= 0) {
-            return ((array[i - 2] + array[i - 1] + w)).trim()
+            return ((array[i - 2] + array[i - 1] + w))
         } else {
             return null;
         }
@@ -118,6 +118,7 @@ export const search = async (search: string) => {
     const sortedWeight = sortWeights(totalWeight);
     const orderedWeight = sortedWeight.filter(({index, weight}) => weight > Math.max(0, terms.length - 2));
     const localDataIds = new Set(orderedWeight.map(({index}) => (index - (index % 100)) / 100).filter(i => !dataIds.has(i)));
+    debugger;
     const dataList = await Promise.all([...localDataIds.keys()]
         .slice(0, LIMIT_CHUNK_DATA)
         .map((dataId) => {

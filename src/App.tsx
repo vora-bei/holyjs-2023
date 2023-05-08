@@ -413,7 +413,7 @@ function App() {
                             <div
                                 className={"factoid-item-value " + (factoid3(engine, getAllLength()))
                                 }>
-                                {getAllLength()} <span
+                                {new String(getAllLength()).replace(".",",")} <span
                                 className={"factoid-item-measure"}>mb</span>
                             </div>
                             <div className={"factoid-item-metric"}>
