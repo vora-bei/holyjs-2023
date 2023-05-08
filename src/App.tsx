@@ -6,6 +6,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 import {Col, Container, Row, Table} from 'react-bootstrap';
 import {search as search1} from './engines/engines1';
 import {search as search2} from './engines/engines2';
@@ -43,10 +45,20 @@ const algorithms = [
     {value: "lemming", label: "Леметизация"},
     {value: "lemming pre-calculate", label: "Леметизация предрасчет"},
     {value: "lemming indexed", label: "Леметизация индекс"},
-    {value: "levenshtein", label: "Левенштейн"},
+    {value: "levenshtein", label: "Левенштейн +"},
     {value: "n-gram indexed", label: "N-gram индекс"},
     {value: "n-gram spread index", label: "N-gram cdn индекс"}
 ];
+const popover = (
+    <Popover>
+        <Popover.Header>Пасхалка</Popover.Header>
+        <Popover.Body>
+            Экстра результаты: для поиска нет неверных и верных результатов.
+            Для оценки результатов текущего алгоритма используется Алгоритм N-Gram
+        </Popover.Body>
+
+    </Popover>
+);
 
 function App() {
     const [films, setFilms] = useState<string[]>([]);
@@ -63,7 +75,7 @@ function App() {
     const [film7Index, setFilm7Index] = useState<Map<string, Set<number>>>(new Map());
     const [localSearch, setSearch] = useState("");
     const [engine, setEngine] = useState("simple");
-    const [dataSize, setDataSize] = useState("little");
+    const [dataSize, setDataSize] = useState("large");
     const search = useDeferredValue(localSearch)
 
     useEffect(() => {
@@ -75,9 +87,9 @@ function App() {
                     .then(size => setContentLength(size));
                 return res.json()
             })
-            .then(films => {
+            .then((films: string[]) => {
                 setTimeStartNetwork(Math.ceil(performance.now() - now1));
-                setFilms(films)
+                setFilms([...(new Set(films))])
             })
     }, [])
     useEffect(() => {
@@ -165,7 +177,9 @@ function App() {
             return <CheckLg size={30} color={"#08B562"}/>
         }
         if (resultSet.has(film)) {
-            return <X size={30} color={"#E82080"}/>;
+            return <OverlayTrigger trigger={["hover","focus"]} placement="right" overlay={popover}>
+                <CheckLg size={30} color={"orange"} />
+            </OverlayTrigger>
         }
         if (comparedSet.has(film)) {
             return <X size={30} color={"#E82080"}/>;
@@ -218,20 +232,7 @@ function App() {
             <thead>
             <tr>
                 <th>
-                    <NavDropdown
-                        title={dataSize === "little" ? "Срез данных" : "Все данные"}
-                        defaultValue={dataSize}
-                    >
-                        <NavDropdown.Item
-                            data-value="little"
-                            onClick={(e) => setDataSize("little")}>
-                            Срез данных
-                        </NavDropdown.Item>
-                        <NavDropdown.Item
-                            onClick={(e) => setDataSize("large")}>
-                            Все данные
-                        </NavDropdown.Item>
-                    </NavDropdown>
+                    Фильмы
                     <div className={"length"}>
                         {dataSize === "little" ? "10" : "100 000"}
                     </div>
@@ -244,6 +245,7 @@ function App() {
                     >
                         {
                             algorithms.map(({label, value}) => <NavDropdown.Item
+                                key={value}
                                 onClick={(e) => setEngine(value)}>
                                 {label}
                             </NavDropdown.Item>)

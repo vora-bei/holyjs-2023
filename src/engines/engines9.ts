@@ -6,7 +6,7 @@ const stemmerRu = new stemmer();
 const gramm3 = (word: string) => {
     const words = [...(" " + word)].map((w: string, i: number, array: string[]) => {
         if (i - 2 >= 0) {
-            return array[i - 2] + array[i - 1] + w
+            return ((array[i - 2] + array[i - 1] + w)).trim()
         } else {
             return null;
         }

@@ -20,7 +20,7 @@ export const createIndex: (films: string[]) => Map<string, Set<number>> = (films
             })
         return sum;
     }, new Map<string, Set<number>>());
-const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index: number, weight: number }[] => {
+const getWeights = (terms: string[], index: Map<string, Set<number>>): { index: number, weight: number }[] => {
     const preSearch: Set<number>[] = terms
         .map(term => index.get(term))
         .filter(Boolean) as Set<number>[];
@@ -37,10 +37,11 @@ const getWeights = (terms: string[], index:  Map<string, Set<number>>): { index:
         .map((row) => {
             return {index: row[0], weight: row[1]};
         })
+        .filter((w) => w.weight === terms.length)
 }
 
 export const search = (index: Map<string, Set<number>>, films: string[], search: string) => {
-    if(!search || !search.length){
+    if (!search || !search.length) {
         return [];
     }
     const terms = tokenizr(search);
