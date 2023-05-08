@@ -118,7 +118,6 @@ export const search = async (search: string) => {
     const sortedWeight = sortWeights(totalWeight);
     const orderedWeight = sortedWeight.filter(({index, weight}) => weight > Math.max(0, terms.length - 2));
     const localDataIds = new Set(orderedWeight.map(({index}) => (index - (index % 100)) / 100).filter(i => !dataIds.has(i)));
-    debugger;
     const dataList = await Promise.all([...localDataIds.keys()]
         .slice(0, LIMIT_CHUNK_DATA)
         .map((dataId) => {
