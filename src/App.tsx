@@ -232,26 +232,49 @@ function App() {
             <thead>
             <tr>
                 <th>
-                    Фильмы
-                    <div className={"length"}>
-                        {dataSize === "little" ? "10" : "100 000"}
+                    <div className={"algorithms-left"}>
+                        <NavDropdown
+
+                            className={"algorithms-navbar"}
+                            title={algorithms.find((e) => e.value === engine)?.label}
+                            defaultValue={dataSize}
+                        >
+                            {
+                                algorithms.map(({label, value}) => <NavDropdown.Item
+                                    key={value}
+                                    onClick={(e) => setEngine(value)}>
+                                    {label}
+                                </NavDropdown.Item>)
+                            }
+                        </NavDropdown>
+                        <div className={"badge-2B2A32"}>{successCount} из {successCount + missedCount}</div>
+                    </div>
+                    <div className={"algorithms-right"}>
+                        Фильмы
+                        <div className={"length"}>
+                            {dataSize === "little" ? "10" : "100 000"}
+                        </div>
                     </div>
                 </th>
                 <th>
-                    <NavDropdown
-                        className={"algorithms-navbar"}
-                        title={algorithms.find((e) => e.value === engine)?.label}
-                        defaultValue={dataSize}
-                    >
-                        {
-                            algorithms.map(({label, value}) => <NavDropdown.Item
-                                key={value}
-                                onClick={(e) => setEngine(value)}>
-                                {label}
-                            </NavDropdown.Item>)
-                        }
-                    </NavDropdown>
-                    <div className={"badge-2B2A32"}>{successCount} из {successCount + missedCount}</div>
+                    <div className={"algorithms-right"}>
+                        <NavDropdown
+
+                            className={"algorithms-navbar"}
+                            title={algorithms.find((e) => e.value === engine)?.label}
+                            defaultValue={dataSize}
+                        >
+                            {
+                                algorithms.map(({label, value}) => <NavDropdown.Item
+                                    key={value}
+                                    onClick={(e) => setEngine(value)}>
+                                    {label}
+                                </NavDropdown.Item>)
+                            }
+                        </NavDropdown>
+                        <div className={"badge-2B2A32"}>{successCount} из {successCount + missedCount}</div>
+                    </div>
+
                 </th>
             </tr>
             </thead>
@@ -346,9 +369,9 @@ function App() {
                     <div className={"header-page"}>
                         <Container>
                             <Row className={"margin-header justify-content-md-center"}>
-                                <Col md={9}>
+                                <Col xl={9} >
                                     <Row>
-                                        <Col xs={8}>
+                                        <Col xs={9}>
                                             <h1 className={"title mb-3"}>Нечеткий поиск</h1>
                                         </Col>
                                         <Col xs={1}>

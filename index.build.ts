@@ -4,6 +4,18 @@ import {stemmer} from 'stemmer-ru';
 
 const stemmerRu = new stemmer();
 
+const exampleFilms = [
+    "Аватар",
+    "Джон уик",
+    "Матрица: Перезагрузка",
+    "Криминальное чтиво",
+    "Помни",
+    "Волк с Уолл-стрит",
+    "Властелин колец: Возвращение короля",
+    "Интерстеллар",
+    "Назад в будущее",
+    "Иван Васильевич меняет профессию"
+];
 const gramm3 = (word: string) => {
     const words = [...(" " + word)].map((w, i, array) => {
         if (i - 2 >= 0) {
@@ -78,6 +90,11 @@ export const splitData = (films: string[]) => {
 const index = createIndex(films);
 const chunkIndex = splitIndex(index);
 const chunkData = splitData(films);
+
+const exampleIndex = createIndex(exampleFilms);
+const exampleChunkIndex = splitIndex(exampleIndex);
+console.log(JSON.stringify(exampleChunkIndex.map((value) => value.slice)));
+console.log(JSON.stringify(exampleChunkIndex.map((value) => value.index)));
 chunkIndex.forEach(async (value, index) => {
     await writeFile(`./public/index/index-${index}.json`, JSON.stringify(value.index));
 });

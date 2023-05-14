@@ -125,6 +125,7 @@ th {
     margin-top: -70px;
     background-color: #010A12;
 }
+
 .parallax {
     /* The image used */
     background-image: url("/holyjs_2023_spring_hero_bg 5.png");
@@ -200,19 +201,34 @@ th {
     body {
         font-size: 15px;
     }
-
+    .badge-2B2A32 {
+        white-space: nowrap;
+        border-radius: 8px;
+        /*padding: 2px 2px;*/
+        display: inline-block;
+        color: white;
+        background-color: #2B2A32 !important;
+        height: 20px;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 14px;
+    }
     .factoids {
         margin-top: 50px;
         margin-bottom: 10px;
         position: fixed;
         align-items: stretch;
         flex-direction: row;
+        justify-content: center;
         bottom: 20px;
         background-color: white;
     }
-    .factoid-item-metric{
+
+    .factoid-item-metric {
         font-size: 12px;
     }
+
     .factoid-item-value {
         font-weight: 700;
         /*font-size: 18px;*/
@@ -221,6 +237,7 @@ th {
     .dropdown-menu {
         font-size: 1rem;
     }
+
     .title {
         font-size: 40px;
         line-height: 46px;
@@ -239,15 +256,34 @@ th {
 
         color: #FFFFFF;
     }
+
     .form-control-lg {
         font-size: 1.5rem;
     }
-    .algorithms-navbar > .nav-link{
-        width: 100px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+
+    .algorithms-navbar > .nav-link {
+        /*width: 100px;*/
+        /*overflow: hidden;*/
+        /*text-overflow: ellipsis;*/
     }
-    .content{
+
+    .content {
         margin-bottom: 150px;
+    }
+}
+@media screen and (max-width: 500px) {
+    .algorithms-right {
+        display: none
+    }
+    .algorithms-left {
+        display: block
+    }
+}
+@media screen and (min-width: 500px) {
+    .algorithms-right {
+        display: block;
+    }
+    .algorithms-left {
+        display: none;
     }
 }
