@@ -41,10 +41,10 @@ const index5 = createIndex5(exampleFilms);
 const algorithms = [
     {value: "simple", label: "Наивый вариант"},
     {value: "lowercase", label: "Lowercase"},
-    {value: "stemming", label: "Стеминг"},
-    {value: "lemming", label: "Леметизация"},
-    {value: "lemming pre-calculate", label: "Леметизация предрасчет"},
-    {value: "lemming indexed", label: "Леметизация индекс"},
+    {value: "stemming", label: "Стемминг"},
+    {value: "lemming", label: "Лемматизация"},
+    {value: "lemming pre-calculate", label: "Лемматизация предрасчет"},
+    {value: "lemming indexed", label: "Лемматизация индекс"},
     {value: "levenshtein", label: "Левенштейн +"},
     {value: "n-gram indexed", label: "N-gram индекс"},
     {value: "n-gram spread index", label: "N-gram cdn индекс"}
