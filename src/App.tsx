@@ -41,17 +41,16 @@ const index5 = createIndex5(exampleFilms);
 const algorithms = [
     {value: "simple", label: "Наивый вариант"},
     {value: "lowercase", label: "Lowercase"},
-    {value: "stemming", label: "Стемминг"},
-    {value: "lemming", label: "Лемматизация"},
-    {value: "lemming pre-calculate", label: "Лемматизация предрасчет"},
-    {value: "lemming indexed", label: "Лемматизация индекс"},
+    {value: "tokenization", label: "Токенизация"},
+    {value: "stemmer", label: "Стемминг"},
+    {value: "stemmer pre-calculate", label: "Стемминг предрасчет"},
+    {value: "stemmer indexed", label: "Стемминг индекс"},
     {value: "levenshtein", label: "Левенштейн +"},
     {value: "n-gram indexed", label: "N-gram индекс"},
     {value: "n-gram spread index", label: "N-gram cdn индекс"}
 ];
 const popover = (
     <Popover>
-        <Popover.Header>Пасхалка</Popover.Header>
         <Popover.Body>
             Экстра результаты: для поиска нет неверных и верных результатов.
             Для оценки результатов текущего алгоритма используется Алгоритм N-Gram
@@ -93,7 +92,7 @@ function App() {
             })
     }, [])
     useEffect(() => {
-        if (films.length && !film5Index.length && engine === 'lemming pre-calculate') {
+        if (films.length && !film5Index.length && engine === 'stemmer pre-calculate') {
             const t0 = performance.now();
             setFilm5Index(createIndex5(films))
             const t1 = performance.now();
@@ -101,7 +100,7 @@ function App() {
         }
     }, [films.length, film5Index, engine])
     useEffect(() => {
-        if (films.length && !film6Index.size && engine === 'lemming indexed') {
+        if (films.length && !film6Index.size && engine === 'stemmer indexed') {
             const t01 = performance.now();
             setFilm6Index(createIndex6(films))
             const t11 = performance.now();
@@ -138,15 +137,15 @@ function App() {
                 return search1(data, search);
             case "lowercase":
                 return search2(data, search)
-            case "stemming":
+            case "tokenization":
                 return search3(data, search)
-            case "lemming":
+            case "stemmer":
                 return search4(data, search)
-            case "lemming pre-calculate":
+            case "stemmer pre-calculate":
                 if (!index5L.length)
                     return []
                 return search5(index5L, data, search)
-            case "lemming indexed":
+            case "stemmer indexed":
                 if (!index6L.size)
                     return []
                 return search6(index6L, data, search)
@@ -195,9 +194,9 @@ function App() {
             return 1;
         }
         switch (engine) {
-            case "lemming pre-calculate":
+            case "stemmer pre-calculate":
                 return timeStart5;
-            case "lemming indexed":
+            case "stemmer indexed":
                 return timeStart6;
             case "n-gram indexed":
                 return timeStart7;
